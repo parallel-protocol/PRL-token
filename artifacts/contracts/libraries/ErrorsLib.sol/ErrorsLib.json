@@ -1,0 +1,21 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "ErrorsLib",
+  "sourceName": "contracts/libraries/ErrorsLib.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "AddressZero",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidMsgLength",
+      "type": "error"
+    }
+  ],
+  "bytecode": "0x60566037600b82828239805160001a607314602a57634e487b7160e01b600052600060045260246000fd5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea2646970667358221220ecbbddd17b78ada75da5bbf7454949307fe27deef41516f9d7dbe1d18a1e55c664736f6c63430008190033",
+  "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fdfea2646970667358221220ecbbddd17b78ada75da5bbf7454949307fe27deef41516f9d7dbe1d18a1e55c664736f6c63430008190033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
