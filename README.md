@@ -1,6 +1,7 @@
 # Overview
 
-This repository contains the source code for contracts and testing suites related to the PRL token migration from MIMO and the way to bridge it. Details documentation can be found under the [/docs](./docs) folder.
+This repository contains the source code for contracts and testing suites related to the PRL token migration from MIMO
+and the way to bridge it. Details documentation can be found under the [/docs](./docs) folder.
 
 ## Repository Structure
 
@@ -17,9 +18,17 @@ This repository contains the source code for contracts and testing suites relate
 
 The repository contains 3 types of contract:
 
-- The [`PRL`]('./contracts/principal/PRL.sol) token contract that inherit of Openzeppelin ERC20 and ERC20Permit standards.
-- The Migrations contracts handled by the [`PrincipalMigrationContract`]('./contracts/principal/PrincipalMigrationContract.sol) and [`PeripheralMigrationContract`]('./contracts/peripheral/PeripheralMigrationContract.sol) contracts that leveraging on [LayerZero's OApp standard](https://docs.layerzero.network/v2/home/protocol/contract-standards#oapp) for migrating Mimo from anychain to PRL on anychain.
-- The Bridging of PRL, handled by the [`LockBox`]('./contracts/principal/LockBox.sol) and [`PeripheralPRL`]('./contracts/peripheral/PeripheralPRL.sol) contracts that leveraging on fork of [LayerZero's OFT standard](https://docs.layerzero.network/v2/home/protocol/contract-standards#oft) for allow PRL to be omnichain.
+- The [`PRL`]('./contracts/principal/PRL.sol) token contract that inherit of Openzeppelin ERC20 and ERC20Permit
+  standards.
+- The Migrations contracts handled by the
+  [`PrincipalMigrationContract`]('./contracts/principal/PrincipalMigrationContract.sol) and
+  [`PeripheralMigrationContract`]('./contracts/peripheral/PeripheralMigrationContract.sol) contracts that leveraging on
+  [LayerZero's OApp standard](https://docs.layerzero.network/v2/home/protocol/contract-standards#oapp) for migrating
+  Mimo from anychain to PRL on anychain.
+- The Bridging of PRL, handled by the [`LockBox`]('./contracts/principal/LockBox.sol) and
+  [`PeripheralPRL`]('./contracts/peripheral/PeripheralPRL.sol) contracts that leveraging on fork of
+  [LayerZero's OFT standard](https://docs.layerzero.network/v2/home/protocol/contract-standards#oft) for allow PRL to be
+  omnichain.
 
 See the [documentation](./docs/README.md) for more details.
 
@@ -38,7 +47,8 @@ bun i
 
 ### Fill the `.env` file with your data
 
-The Foundry script relies solely on the PRIVATE_KEY. The MNEMONIC is used on the Hardhat side and will override the PRIVATE_KEY if it is defined.
+The Foundry script relies solely on the PRIVATE_KEY. The MNEMONIC is used on the Hardhat side and will override the
+PRIVATE_KEY if it is defined.
 
 ```bash
 MNEMONIC=

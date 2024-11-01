@@ -82,6 +82,7 @@ contract PeripheralPRL_SendWithPermit_Integrations_Test is Integrations_Test {
             "",
             ""
         );
+
         (uint256 deadline, uint8 v, bytes32 r, bytes32 s) =
             _signPermitData(users.alice.pk(), address(peripheralPRLA), DEFAULT_AMOUNT_MIGRATED, address(peripheralPRLA));
 
