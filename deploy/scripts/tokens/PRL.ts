@@ -28,6 +28,6 @@ const deploy: DeployFunction = async (hre) => {
   console.log(`Deployed contract: ${contractName}, network: ${hre.network.name}, address: ${contract.address}`);
 };
 
-deploy.tags = [contractName, "Main"];
+deploy.tags = [contractName, "MainChain"];
 
 export default deploy;

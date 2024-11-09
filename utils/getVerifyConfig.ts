@@ -8,20 +8,20 @@ type VerifyConfig = {
 export const getVerifyConfig = (network: string): VerifyConfig => {
   switch (network) {
     case "mainnet": {
-      if (!process.env.ETHERSCAN_API_KEY) throw new Error("ETHERSCAN_API_KEY is not set");
+      if (!process.env.ETHSCAN_API_KEY) throw new Error("ETHSCAN_API_KEY is not set");
       return {
         etherscan: {
-          apiUrl: "https://api.etherscan.io/api",
-          apiKey: process.env.ETHERSCAN_API_KEY,
+          apiUrl: "https://api.etherscan.io",
+          apiKey: process.env.ETHSCAN_API_KEY,
         },
       };
     }
     case "sepolia": {
-      if (!process.env.ETHERSCAN_API_KEY) throw new Error("ETHERSCAN_API_KEY is not set");
+      if (!process.env.ETHSCAN_API_KEY) throw new Error("ETHSCAN_API_KEY is not set");
       return {
         etherscan: {
           apiUrl: "https://api-sepolia.etherscan.io",
-          apiKey: process.env.ETHERSCAN_API_KEY,
+          apiKey: process.env.ETHSCAN_API_KEY,
         },
       };
     }
@@ -43,7 +43,7 @@ export const getVerifyConfig = (network: string): VerifyConfig => {
         },
       };
     }
-    case "arbSepolia": {
+    case "arbiSepolia": {
       if (!process.env.ARBISCAN_API_KEY) throw new Error("ARBISCAN_API_KEY is not set");
       return {
         etherscan: {
@@ -53,10 +53,10 @@ export const getVerifyConfig = (network: string): VerifyConfig => {
       };
     }
     case "fantom": {
-      if (!process.env.ARBISCAN_API_KEY) throw new Error("FTMSCAN_API_KEY is not set");
+      if (!process.env.FTMSCAN_API_KEY) throw new Error("FTMSCAN_API_KEY is not set");
       return {
         etherscan: {
-          apiUrl: "https://api.ftmscan.com/api",
+          apiUrl: "https://api.ftmscan.com",
           apiKey: process.env.FTMSCAN_API_KEY,
         },
       };

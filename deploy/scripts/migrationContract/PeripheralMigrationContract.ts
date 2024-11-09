@@ -6,7 +6,7 @@ import { GAS } from "../../utils";
 import { readFileSync } from "fs";
 import { ConfigData } from "../../utils/types";
 
-const contractName = "PrincipalMigrationContract";
+const contractName = "PeripheralMigrationContract";
 
 const deploy: DeployFunction = async (hre) => {
   const { getNamedAccounts, deployments } = hre;

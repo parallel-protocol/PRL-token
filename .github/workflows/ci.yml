@@ -45,7 +45,7 @@ jobs:
         uses: "foundry-rs/foundry-toolchain@v1"
 
       - name: "Install Bun"
-        uses: "oven-sh/setup-bun@v1"
+        uses: "oven-sh/setup-bun@v2"
 
       - name: "Install the Node.js dependencies"
         run: "bun install"
