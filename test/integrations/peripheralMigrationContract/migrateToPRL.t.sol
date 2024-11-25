@@ -10,16 +10,14 @@ contract PeripheralMigrationContract_LzReceive_Integrations_Test is Integrations
         amountToMigrate = _bound(amountToMigrate, 10, INITIAL_BALANCE);
 
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(450_000, 0);
-        bytes memory extraReturnOptions = OptionsBuilder.newOptions().addExecutorLzReceiveOption(210_000, 0);
 
-        MessagingFee memory fees = peripheralMigrationContractA.quote(
-            mainEid, users.alice.addr(), amountToMigrate, options, extraReturnOptions
-        );
+        MessagingFee memory fees =
+            peripheralMigrationContractA.quote(mainEid, users.alice.addr(), amountToMigrate, options, "");
 
         startPrank(users.alice);
         mimo.approve(address(peripheralMigrationContractA), amountToMigrate);
         peripheralMigrationContractA.migrateToPRL{ value: fees.nativeFee }(
-            users.alice.addr(), amountToMigrate, mainEid, options, extraReturnOptions
+            users.alice.addr(), amountToMigrate, mainEid, options, ""
         );
         verifyPackets(mainEid, addressToBytes32(address(principalMigrationContract)));
 

@@ -103,6 +103,13 @@ send/receive. Below you will find the possible scenarios:
 
 In this case we just transfer Mimo to the contract from the user and send him PRL.
 
+- Migrate from Main to chain A
+
+![Migrate on main](./assets/migrate-main-to-A.png)
+
+In this case we swap Mimo to PRL on the main chain and send the PRL to the LockBox (OFT) that will lock the PRL and send
+a message to the PeripheralPRL contract on the destination chain.
+
 - Migrate from chain A to Main
 
 ![Migrate from A to main](./assets/migrate-A-to-Main.png)
