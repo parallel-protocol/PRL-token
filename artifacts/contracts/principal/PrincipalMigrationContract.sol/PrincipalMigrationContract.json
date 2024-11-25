@@ -649,7 +649,7 @@
           "type": "uint256"
         }
       ],
-      "name": "migrateMimoToPRL",
+      "name": "migrateToPRL",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"

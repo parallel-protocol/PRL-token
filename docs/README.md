@@ -120,7 +120,7 @@ from the PrincipalMigrationContract to itself and send the message to the final 
 
 ### Pause
 
-A `pause` function exists to prevent new `send()` and `migrateMimoToPRL()` calls from being executed. This is useful in
+A `pause` function exists to prevent new `send()` and `migrateToPRL()` calls from being executed. This is useful in
 the event of a bug or security vulnerability.
 
 Only the **Owner** can call pause

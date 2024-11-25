@@ -6,7 +6,6 @@ import "test/Integrations.t.sol";
 contract PeripheralPRL_SendWithPermit_Integrations_Test is Integrations_Test {
     using OptionsBuilder for bytes;
     using OFTMsgCodec for bytes;
-    using WadRayMath for uint256;
 
     function setUp() public virtual override {
         super.setUp();

@@ -29,11 +29,11 @@ export type EnforcedOptionParamStruct = {
   options: BytesLike;
 };
 
-export type EnforcedOptionParamStructOutput = [
-  eid: bigint,
-  msgType: bigint,
-  options: string
-] & { eid: bigint; msgType: bigint; options: string };
+export type EnforcedOptionParamStructOutput = [eid: bigint, msgType: bigint, options: string] & {
+  eid: bigint;
+  msgType: bigint;
+  options: string;
+};
 
 export type OriginStruct = {
   srcEid: BigNumberish;
@@ -41,11 +41,11 @@ export type OriginStruct = {
   nonce: BigNumberish;
 };
 
-export type OriginStructOutput = [
-  srcEid: bigint,
-  sender: string,
-  nonce: bigint
-] & { srcEid: bigint; sender: string; nonce: bigint };
+export type OriginStructOutput = [srcEid: bigint, sender: string, nonce: bigint] & {
+  srcEid: bigint;
+  sender: string;
+  nonce: bigint;
+};
 
 export interface PrincipalMigrationContractInterface extends Interface {
   getFunction(
@@ -62,7 +62,7 @@ export interface PrincipalMigrationContractInterface extends Interface {
       | "isComposeMsgSender"
       | "lockBox"
       | "lzReceive"
-      | "migrateMimoToPRL"
+      | "migrateToPRL"
       | "nextNonce"
       | "oAppVersion"
       | "owner"
@@ -74,7 +74,7 @@ export interface PrincipalMigrationContractInterface extends Interface {
       | "setEnforcedOptions"
       | "setPeer"
       | "transferOwnership"
-      | "unpause"
+      | "unpause",
   ): FunctionFragment;
 
   getEvent(
@@ -86,155 +86,67 @@ export interface PrincipalMigrationContractInterface extends Interface {
       | "OwnershipTransferred"
       | "Paused"
       | "PeerSet"
-      | "Unpaused"
+      | "Unpaused",
   ): EventFragment;
 
-  encodeFunctionData(
-    functionFragment: "MIGRATION_RATIO",
-    values?: undefined
-  ): string;
+  encodeFunctionData(functionFragment: "MIGRATION_RATIO", values?: undefined): string;
   encodeFunctionData(functionFragment: "MIMO", values?: undefined): string;
   encodeFunctionData(functionFragment: "PRL", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "_decodeMessage",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "allowInitializePath",
-    values: [OriginStruct]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "combineOptions",
-    values: [BigNumberish, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "emergencyRescue",
-    values: [AddressLike, BigNumberish]
-  ): string;
+  encodeFunctionData(functionFragment: "_decodeMessage", values: [BytesLike]): string;
+  encodeFunctionData(functionFragment: "allowInitializePath", values: [OriginStruct]): string;
+  encodeFunctionData(functionFragment: "combineOptions", values: [BigNumberish, BigNumberish, BytesLike]): string;
+  encodeFunctionData(functionFragment: "emergencyRescue", values: [AddressLike, BigNumberish]): string;
   encodeFunctionData(functionFragment: "endpoint", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "enforcedOptions",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "isComposeMsgSender",
-    values: [OriginStruct, BytesLike, AddressLike]
-  ): string;
+  encodeFunctionData(functionFragment: "enforcedOptions", values: [BigNumberish, BigNumberish]): string;
+  encodeFunctionData(functionFragment: "isComposeMsgSender", values: [OriginStruct, BytesLike, AddressLike]): string;
   encodeFunctionData(functionFragment: "lockBox", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "lzReceive",
-    values: [OriginStruct, BytesLike, BytesLike, AddressLike, BytesLike]
+    values: [OriginStruct, BytesLike, BytesLike, AddressLike, BytesLike],
   ): string;
-  encodeFunctionData(
-    functionFragment: "migrateMimoToPRL",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "nextNonce",
-    values: [BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "oAppVersion",
-    values?: undefined
-  ): string;
+  encodeFunctionData(functionFragment: "migrateToPRL", values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: "nextNonce", values: [BigNumberish, BytesLike]): string;
+  encodeFunctionData(functionFragment: "oAppVersion", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
   encodeFunctionData(functionFragment: "peers", values: [BigNumberish]): string;
-  encodeFunctionData(
-    functionFragment: "renounceOwnership",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setDelegate",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setEnforcedOptions",
-    values: [EnforcedOptionParamStruct[]]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setPeer",
-    values: [BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "transferOwnership",
-    values: [AddressLike]
-  ): string;
+  encodeFunctionData(functionFragment: "renounceOwnership", values?: undefined): string;
+  encodeFunctionData(functionFragment: "setDelegate", values: [AddressLike]): string;
+  encodeFunctionData(functionFragment: "setEnforcedOptions", values: [EnforcedOptionParamStruct[]]): string;
+  encodeFunctionData(functionFragment: "setPeer", values: [BigNumberish, BytesLike]): string;
+  encodeFunctionData(functionFragment: "transferOwnership", values: [AddressLike]): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
 
-  decodeFunctionResult(
-    functionFragment: "MIGRATION_RATIO",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "MIGRATION_RATIO", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "MIMO", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "PRL", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "_decodeMessage",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "allowInitializePath",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "combineOptions",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "emergencyRescue",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "_decodeMessage", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "allowInitializePath", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "combineOptions", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "emergencyRescue", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "endpoint", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "enforcedOptions",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "isComposeMsgSender",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "enforcedOptions", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "isComposeMsgSender", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "lockBox", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "lzReceive", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "migrateMimoToPRL",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "migrateToPRL", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nextNonce", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "oAppVersion",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "oAppVersion", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "peers", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "renounceOwnership",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setDelegate",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "setEnforcedOptions",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "renounceOwnership", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "setDelegate", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "setEnforcedOptions", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "setPeer", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "transferOwnership",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "transferOwnership", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
 }
 
 export namespace EmergencyRescuedEvent {
-  export type InputTuple = [
-    token: AddressLike,
-    amount: BigNumberish,
-    recipient: AddressLike
-  ];
+  export type InputTuple = [token: AddressLike, amount: BigNumberish, recipient: AddressLike];
   export type OutputTuple = [token: string, amount: bigint, recipient: string];
   export interface OutputObject {
     token: string;
@@ -249,9 +161,7 @@ export namespace EmergencyRescuedEvent {
 
 export namespace EnforcedOptionSetEvent {
   export type InputTuple = [_enforcedOptions: EnforcedOptionParamStruct[]];
-  export type OutputTuple = [
-    _enforcedOptions: EnforcedOptionParamStructOutput[]
-  ];
+  export type OutputTuple = [_enforcedOptions: EnforcedOptionParamStructOutput[]];
   export interface OutputObject {
     _enforcedOptions: EnforcedOptionParamStructOutput[];
   }
@@ -262,16 +172,8 @@ export namespace EnforcedOptionSetEvent {
 }
 
 export namespace MIMOToPRLMigratedEvent {
-  export type InputTuple = [
-    receiver: AddressLike,
-    mimoAmount: BigNumberish,
-    prlAmount: BigNumberish
-  ];
-  export type OutputTuple = [
-    receiver: string,
-    mimoAmount: bigint,
-    prlAmount: bigint
-  ];
+  export type InputTuple = [receiver: AddressLike, mimoAmount: BigNumberish, prlAmount: BigNumberish];
+  export type OutputTuple = [receiver: string, mimoAmount: bigint, prlAmount: bigint];
   export interface OutputObject {
     receiver: string;
     mimoAmount: bigint;
@@ -291,7 +193,7 @@ export namespace MigrationMessageReceivedEvent {
     destEid: BigNumberish,
     receiver: AddressLike,
     mimoAmount: BigNumberish,
-    prlAmount: BigNumberish
+    prlAmount: BigNumberish,
   ];
   export type OutputTuple = [
     guid: string,
@@ -300,7 +202,7 @@ export namespace MigrationMessageReceivedEvent {
     destEid: bigint,
     receiver: string,
     mimoAmount: bigint,
-    prlAmount: bigint
+    prlAmount: bigint,
   ];
   export interface OutputObject {
     guid: string;
@@ -376,39 +278,29 @@ export interface PrincipalMigrationContract extends BaseContract {
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined
+    toBlock?: string | number | undefined,
   ): Promise<Array<TypedEventLog<TCEvent>>>;
   queryFilter<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
     fromBlockOrBlockhash?: string | number | undefined,
-    toBlock?: string | number | undefined
+    toBlock?: string | number | undefined,
   ): Promise<Array<TypedEventLog<TCEvent>>>;
 
-  on<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
-    listener: TypedListener<TCEvent>
-  ): Promise<this>;
+  on<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
   on<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>
+    listener: TypedListener<TCEvent>,
   ): Promise<this>;
 
-  once<TCEvent extends TypedContractEvent>(
-    event: TCEvent,
-    listener: TypedListener<TCEvent>
-  ): Promise<this>;
+  once<TCEvent extends TypedContractEvent>(event: TCEvent, listener: TypedListener<TCEvent>): Promise<this>;
   once<TCEvent extends TypedContractEvent>(
     filter: TypedDeferredTopicFilter<TCEvent>,
-    listener: TypedListener<TCEvent>
+    listener: TypedListener<TCEvent>,
   ): Promise<this>;
 
-  listeners<TCEvent extends TypedContractEvent>(
-    event: TCEvent
-  ): Promise<Array<TypedListener<TCEvent>>>;
+  listeners<TCEvent extends TypedContractEvent>(event: TCEvent): Promise<Array<TypedListener<TCEvent>>>;
   listeners(eventName?: string): Promise<Array<Listener>>;
-  removeAllListeners<TCEvent extends TypedContractEvent>(
-    event?: TCEvent
-  ): Promise<this>;
+  removeAllListeners<TCEvent extends TypedContractEvent>(event?: TCEvent): Promise<this>;
 
   MIGRATION_RATIO: TypedContractMethod<[], [bigint], "view">;
 
@@ -424,16 +316,12 @@ export interface PrincipalMigrationContract extends BaseContract {
         amount: bigint;
         destEid: bigint;
         extraOptionsLength: bigint;
-      }
+      },
     ],
     "view"
   >;
 
-  allowInitializePath: TypedContractMethod<
-    [origin: OriginStruct],
-    [boolean],
-    "view"
-  >;
+  allowInitializePath: TypedContractMethod<[origin: OriginStruct], [boolean], "view">;
 
   combineOptions: TypedContractMethod<
     [_eid: BigNumberish, _msgType: BigNumberish, _extraOptions: BytesLike],
@@ -441,19 +329,11 @@ export interface PrincipalMigrationContract extends BaseContract {
     "view"
   >;
 
-  emergencyRescue: TypedContractMethod<
-    [_token: AddressLike, _amount: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
+  emergencyRescue: TypedContractMethod<[_token: AddressLike, _amount: BigNumberish], [void], "nonpayable">;
 
   endpoint: TypedContractMethod<[], [string], "view">;
 
-  enforcedOptions: TypedContractMethod<
-    [eid: BigNumberish, msgType: BigNumberish],
-    [string],
-    "view"
-  >;
+  enforcedOptions: TypedContractMethod<[eid: BigNumberish, msgType: BigNumberish], [string], "view">;
 
   isComposeMsgSender: TypedContractMethod<
     [arg0: OriginStruct, arg1: BytesLike, _sender: AddressLike],
@@ -464,34 +344,16 @@ export interface PrincipalMigrationContract extends BaseContract {
   lockBox: TypedContractMethod<[], [string], "view">;
 
   lzReceive: TypedContractMethod<
-    [
-      _origin: OriginStruct,
-      _guid: BytesLike,
-      _message: BytesLike,
-      _executor: AddressLike,
-      _extraData: BytesLike
-    ],
+    [_origin: OriginStruct, _guid: BytesLike, _message: BytesLike, _executor: AddressLike, _extraData: BytesLike],
     [void],
     "payable"
   >;
 
-  migrateMimoToPRL: TypedContractMethod<
-    [_amount: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
+  migrateToPRL: TypedContractMethod<[_amount: BigNumberish], [void], "nonpayable">;
 
-  nextNonce: TypedContractMethod<
-    [arg0: BigNumberish, arg1: BytesLike],
-    [bigint],
-    "view"
-  >;
+  nextNonce: TypedContractMethod<[arg0: BigNumberish, arg1: BytesLike], [bigint], "view">;
 
-  oAppVersion: TypedContractMethod<
-    [],
-    [[bigint, bigint] & { senderVersion: bigint; receiverVersion: bigint }],
-    "view"
-  >;
+  oAppVersion: TypedContractMethod<[], [[bigint, bigint] & { senderVersion: bigint; receiverVersion: bigint }], "view">;
 
   owner: TypedContractMethod<[], [string], "view">;
 
@@ -503,48 +365,22 @@ export interface PrincipalMigrationContract extends BaseContract {
 
   renounceOwnership: TypedContractMethod<[], [void], "nonpayable">;
 
-  setDelegate: TypedContractMethod<
-    [_delegate: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+  setDelegate: TypedContractMethod<[_delegate: AddressLike], [void], "nonpayable">;
 
-  setEnforcedOptions: TypedContractMethod<
-    [_enforcedOptions: EnforcedOptionParamStruct[]],
-    [void],
-    "nonpayable"
-  >;
+  setEnforcedOptions: TypedContractMethod<[_enforcedOptions: EnforcedOptionParamStruct[]], [void], "nonpayable">;
 
-  setPeer: TypedContractMethod<
-    [_eid: BigNumberish, _peer: BytesLike],
-    [void],
-    "nonpayable"
-  >;
+  setPeer: TypedContractMethod<[_eid: BigNumberish, _peer: BytesLike], [void], "nonpayable">;
 
-  transferOwnership: TypedContractMethod<
-    [newOwner: AddressLike],
-    [void],
-    "nonpayable"
-  >;
+  transferOwnership: TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
 
   unpause: TypedContractMethod<[], [void], "nonpayable">;
 
-  getFunction<T extends ContractMethod = ContractMethod>(
-    key: string | FunctionFragment
-  ): T;
+  getFunction<T extends ContractMethod = ContractMethod>(key: string | FunctionFragment): T;
 
-  getFunction(
-    nameOrSignature: "MIGRATION_RATIO"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "MIMO"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "PRL"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "_decodeMessage"
-  ): TypedContractMethod<
+  getFunction(nameOrSignature: "MIGRATION_RATIO"): TypedContractMethod<[], [bigint], "view">;
+  getFunction(nameOrSignature: "MIMO"): TypedContractMethod<[], [string], "view">;
+  getFunction(nameOrSignature: "PRL"): TypedContractMethod<[], [string], "view">;
+  getFunction(nameOrSignature: "_decodeMessage"): TypedContractMethod<
     [_encodedMessage: BytesLike],
     [
       [string, bigint, bigint, bigint] & {
@@ -552,172 +388,98 @@ export interface PrincipalMigrationContract extends BaseContract {
         amount: bigint;
         destEid: bigint;
         extraOptionsLength: bigint;
-      }
+      },
     ],
     "view"
   >;
+  getFunction(nameOrSignature: "allowInitializePath"): TypedContractMethod<[origin: OriginStruct], [boolean], "view">;
   getFunction(
-    nameOrSignature: "allowInitializePath"
-  ): TypedContractMethod<[origin: OriginStruct], [boolean], "view">;
+    nameOrSignature: "combineOptions",
+  ): TypedContractMethod<[_eid: BigNumberish, _msgType: BigNumberish, _extraOptions: BytesLike], [string], "view">;
   getFunction(
-    nameOrSignature: "combineOptions"
+    nameOrSignature: "emergencyRescue",
+  ): TypedContractMethod<[_token: AddressLike, _amount: BigNumberish], [void], "nonpayable">;
+  getFunction(nameOrSignature: "endpoint"): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "enforcedOptions",
+  ): TypedContractMethod<[eid: BigNumberish, msgType: BigNumberish], [string], "view">;
+  getFunction(
+    nameOrSignature: "isComposeMsgSender",
+  ): TypedContractMethod<[arg0: OriginStruct, arg1: BytesLike, _sender: AddressLike], [boolean], "view">;
+  getFunction(nameOrSignature: "lockBox"): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "lzReceive",
   ): TypedContractMethod<
-    [_eid: BigNumberish, _msgType: BigNumberish, _extraOptions: BytesLike],
-    [string],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "emergencyRescue"
-  ): TypedContractMethod<
-    [_token: AddressLike, _amount: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "endpoint"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "enforcedOptions"
-  ): TypedContractMethod<
-    [eid: BigNumberish, msgType: BigNumberish],
-    [string],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "isComposeMsgSender"
-  ): TypedContractMethod<
-    [arg0: OriginStruct, arg1: BytesLike, _sender: AddressLike],
-    [boolean],
-    "view"
-  >;
-  getFunction(
-    nameOrSignature: "lockBox"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "lzReceive"
-  ): TypedContractMethod<
-    [
-      _origin: OriginStruct,
-      _guid: BytesLike,
-      _message: BytesLike,
-      _executor: AddressLike,
-      _extraData: BytesLike
-    ],
+    [_origin: OriginStruct, _guid: BytesLike, _message: BytesLike, _executor: AddressLike, _extraData: BytesLike],
     [void],
     "payable"
   >;
+  getFunction(nameOrSignature: "migrateToPRL"): TypedContractMethod<[_amount: BigNumberish], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "migrateMimoToPRL"
-  ): TypedContractMethod<[_amount: BigNumberish], [void], "nonpayable">;
+    nameOrSignature: "nextNonce",
+  ): TypedContractMethod<[arg0: BigNumberish, arg1: BytesLike], [bigint], "view">;
   getFunction(
-    nameOrSignature: "nextNonce"
-  ): TypedContractMethod<
-    [arg0: BigNumberish, arg1: BytesLike],
-    [bigint],
-    "view"
-  >;
+    nameOrSignature: "oAppVersion",
+  ): TypedContractMethod<[], [[bigint, bigint] & { senderVersion: bigint; receiverVersion: bigint }], "view">;
+  getFunction(nameOrSignature: "owner"): TypedContractMethod<[], [string], "view">;
+  getFunction(nameOrSignature: "pause"): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(nameOrSignature: "paused"): TypedContractMethod<[], [boolean], "view">;
+  getFunction(nameOrSignature: "peers"): TypedContractMethod<[eid: BigNumberish], [string], "view">;
+  getFunction(nameOrSignature: "renounceOwnership"): TypedContractMethod<[], [void], "nonpayable">;
+  getFunction(nameOrSignature: "setDelegate"): TypedContractMethod<[_delegate: AddressLike], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "oAppVersion"
-  ): TypedContractMethod<
-    [],
-    [[bigint, bigint] & { senderVersion: bigint; receiverVersion: bigint }],
-    "view"
-  >;
+    nameOrSignature: "setEnforcedOptions",
+  ): TypedContractMethod<[_enforcedOptions: EnforcedOptionParamStruct[]], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "owner"
-  ): TypedContractMethod<[], [string], "view">;
-  getFunction(
-    nameOrSignature: "pause"
-  ): TypedContractMethod<[], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "paused"
-  ): TypedContractMethod<[], [boolean], "view">;
-  getFunction(
-    nameOrSignature: "peers"
-  ): TypedContractMethod<[eid: BigNumberish], [string], "view">;
-  getFunction(
-    nameOrSignature: "renounceOwnership"
-  ): TypedContractMethod<[], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "setDelegate"
-  ): TypedContractMethod<[_delegate: AddressLike], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "setEnforcedOptions"
-  ): TypedContractMethod<
-    [_enforcedOptions: EnforcedOptionParamStruct[]],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "setPeer"
-  ): TypedContractMethod<
-    [_eid: BigNumberish, _peer: BytesLike],
-    [void],
-    "nonpayable"
-  >;
-  getFunction(
-    nameOrSignature: "transferOwnership"
-  ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "unpause"
-  ): TypedContractMethod<[], [void], "nonpayable">;
+    nameOrSignature: "setPeer",
+  ): TypedContractMethod<[_eid: BigNumberish, _peer: BytesLike], [void], "nonpayable">;
+  getFunction(nameOrSignature: "transferOwnership"): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+  getFunction(nameOrSignature: "unpause"): TypedContractMethod<[], [void], "nonpayable">;
 
   getEvent(
-    key: "EmergencyRescued"
+    key: "EmergencyRescued",
   ): TypedContractEvent<
     EmergencyRescuedEvent.InputTuple,
     EmergencyRescuedEvent.OutputTuple,
     EmergencyRescuedEvent.OutputObject
   >;
   getEvent(
-    key: "EnforcedOptionSet"
+    key: "EnforcedOptionSet",
   ): TypedContractEvent<
     EnforcedOptionSetEvent.InputTuple,
     EnforcedOptionSetEvent.OutputTuple,
     EnforcedOptionSetEvent.OutputObject
   >;
   getEvent(
-    key: "MIMOToPRLMigrated"
+    key: "MIMOToPRLMigrated",
   ): TypedContractEvent<
     MIMOToPRLMigratedEvent.InputTuple,
     MIMOToPRLMigratedEvent.OutputTuple,
     MIMOToPRLMigratedEvent.OutputObject
   >;
   getEvent(
-    key: "MigrationMessageReceived"
+    key: "MigrationMessageReceived",
   ): TypedContractEvent<
     MigrationMessageReceivedEvent.InputTuple,
     MigrationMessageReceivedEvent.OutputTuple,
     MigrationMessageReceivedEvent.OutputObject
   >;
   getEvent(
-    key: "OwnershipTransferred"
+    key: "OwnershipTransferred",
   ): TypedContractEvent<
     OwnershipTransferredEvent.InputTuple,
     OwnershipTransferredEvent.OutputTuple,
     OwnershipTransferredEvent.OutputObject
   >;
   getEvent(
-    key: "Paused"
-  ): TypedContractEvent<
-    PausedEvent.InputTuple,
-    PausedEvent.OutputTuple,
-    PausedEvent.OutputObject
-  >;
+    key: "Paused",
+  ): TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
   getEvent(
-    key: "PeerSet"
-  ): TypedContractEvent<
-    PeerSetEvent.InputTuple,
-    PeerSetEvent.OutputTuple,
-    PeerSetEvent.OutputObject
-  >;
+    key: "PeerSet",
+  ): TypedContractEvent<PeerSetEvent.InputTuple, PeerSetEvent.OutputTuple, PeerSetEvent.OutputObject>;
   getEvent(
-    key: "Unpaused"
-  ): TypedContractEvent<
-    UnpausedEvent.InputTuple,
-    UnpausedEvent.OutputTuple,
-    UnpausedEvent.OutputObject
-  >;
+    key: "Unpaused",
+  ): TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
 
   filters: {
     "EmergencyRescued(address,uint256,address)": TypedContractEvent<
@@ -775,37 +537,21 @@ export interface PrincipalMigrationContract extends BaseContract {
       OwnershipTransferredEvent.OutputObject
     >;
 
-    "Paused(address)": TypedContractEvent<
-      PausedEvent.InputTuple,
-      PausedEvent.OutputTuple,
-      PausedEvent.OutputObject
-    >;
-    Paused: TypedContractEvent<
-      PausedEvent.InputTuple,
-      PausedEvent.OutputTuple,
-      PausedEvent.OutputObject
-    >;
+    "Paused(address)": TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
+    Paused: TypedContractEvent<PausedEvent.InputTuple, PausedEvent.OutputTuple, PausedEvent.OutputObject>;
 
     "PeerSet(uint32,bytes32)": TypedContractEvent<
       PeerSetEvent.InputTuple,
       PeerSetEvent.OutputTuple,
       PeerSetEvent.OutputObject
     >;
-    PeerSet: TypedContractEvent<
-      PeerSetEvent.InputTuple,
-      PeerSetEvent.OutputTuple,
-      PeerSetEvent.OutputObject
-    >;
+    PeerSet: TypedContractEvent<PeerSetEvent.InputTuple, PeerSetEvent.OutputTuple, PeerSetEvent.OutputObject>;
 
     "Unpaused(address)": TypedContractEvent<
       UnpausedEvent.InputTuple,
       UnpausedEvent.OutputTuple,
       UnpausedEvent.OutputObject
     >;
-    Unpaused: TypedContractEvent<
-      UnpausedEvent.InputTuple,
-      UnpausedEvent.OutputTuple,
-      UnpausedEvent.OutputObject
-    >;
+    Unpaused: TypedContractEvent<UnpausedEvent.InputTuple, UnpausedEvent.OutputTuple, UnpausedEvent.OutputObject>;
   };
 }

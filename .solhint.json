@@ -1,5 +1,6 @@
 {
   "extends": "solhint:recommended",
+  "includes": ["./contracts/**/*.sol"],
   "rules": {
     "code-complexity": ["error", 8],
     "compiler-version": ["error", ">=0.8.25"],

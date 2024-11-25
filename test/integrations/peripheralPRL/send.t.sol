@@ -5,7 +5,6 @@ import "test/Integrations.t.sol";
 
 contract PeripheralPRL_Send_Integrations_Test is Integrations_Test {
     using OptionsBuilder for bytes;
-    using WadRayMath for uint256;
 
     function testFuzz_PeripheralPRL_Send_ToMainChain(uint256 amountToMigrate) external {
         amountToMigrate = _bound(amountToMigrate, 10, INITIAL_BALANCE);
