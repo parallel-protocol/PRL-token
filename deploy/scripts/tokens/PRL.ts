@@ -5,7 +5,7 @@ import { type DeployFunction } from "hardhat-deploy/types";
 import { GAS } from "../../utils";
 
 const contractName = "PRL";
-const supplyToMint = parseEther("100000000");
+const supplyToMint = parseEther("1000000000");
 const deploy: DeployFunction = async (hre) => {
   const { getNamedAccounts, deployments } = hre;
 
@@ -21,7 +21,6 @@ const deploy: DeployFunction = async (hre) => {
     from: deployer,
     args: [supplyToMint],
     log: true,
-    skipIfAlreadyDeployed: false,
     ...GAS,
   });
 

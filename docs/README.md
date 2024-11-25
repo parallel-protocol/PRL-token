@@ -40,10 +40,10 @@ The [`PRL`](../contracts/principal/PRL.sol) contract is an immutable contract th
 
 ### PrincipalMigrationContract
 
-The [PrincipalMigrationContract](../contracts/principal/PrincipalMigrationContract.sol) is the main contract that will
-be deployed on the same chain as the PRL token. It will own the total supply of PRL at deployment and will allow users
-to migrate their Mimo to PRL on the same chain or by receiving omnichain messages from other chains. This contract
-inherits from LayerZero's OAppReceiver.
+The [PrincipalMigrationContract](../contracts/principal/PrincipalMigrationContract.sol) is the main migration contract
+that will be deployed on the same chain as the PRL token. It will own the total supply of PRL at deployment and will
+allow users to migrate their Mimo to PRL on the same chain or by receiving omnichain messages from other chains. This
+contract inherits from LayerZero's OAppReceiver.
 
 ### LockBox
 
@@ -120,8 +120,8 @@ from the PrincipalMigrationContract to itself and send the message to the final 
 
 ### Pause
 
-A `pause` function exists to prevent new `send()` and `migrateToPRL()` calls from being executed. This is useful in
-the event of a bug or security vulnerability.
+A `pause` function exists to prevent new `send()` and `migrateToPRL()` calls from being executed. This is useful in the
+event of a bug or security vulnerability.
 
 Only the **Owner** can call pause
 
