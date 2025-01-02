@@ -3,8 +3,6 @@ import assert from "assert";
 import { type DeployFunction } from "hardhat-deploy/types";
 
 import { GAS } from "../../utils";
-import { readFileSync } from "fs";
-import { ConfigData } from "../../utils/types";
 
 const contractName = "PeripheralPRL";
 
