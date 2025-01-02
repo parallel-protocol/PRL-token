@@ -5,46 +5,35 @@ import "test/Integrations.t.sol";
 
 contract PeripheralMigrationContract_LzReceive_Integrations_Test is Integrations_Test {
     using OptionsBuilder for bytes;
-    using WadRayMath for uint256;
 
     function testFuzz_MigrateToPRL_ReceiveOn_PrincipalChain(uint256 amountToMigrate) external {
         amountToMigrate = _bound(amountToMigrate, 10, INITIAL_BALANCE);
-        uint256 expectedReceivedAmount = amountToMigrate.wadMul(principalMigrationContract.MIGRATION_RATIO());
 
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(450_000, 0);
-        bytes memory extraReturnOptions = OptionsBuilder.newOptions().addExecutorLzReceiveOption(210_000, 0);
 
-        MessagingFee memory fees = peripheralMigrationContractA.quote(
-            mainEid, users.alice.addr(), amountToMigrate, options, extraReturnOptions
-        );
+        MessagingFee memory fees =
+            peripheralMigrationContractA.quote(mainEid, users.alice.addr(), amountToMigrate, options, "");
 
         startPrank(users.alice);
         mimo.approve(address(peripheralMigrationContractA), amountToMigrate);
         peripheralMigrationContractA.migrateToPRL{ value: fees.nativeFee }(
-            users.alice.addr(), amountToMigrate, mainEid, options, extraReturnOptions
+            users.alice.addr(), amountToMigrate, mainEid, options, ""
         );
         verifyPackets(mainEid, addressToBytes32(address(principalMigrationContract)));
 
         assertEq(mimo.balanceOf(users.alice.addr()), INITIAL_BALANCE - amountToMigrate);
-        assertEq(prl.balanceOf(users.alice.addr()), expectedReceivedAmount);
-        assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - expectedReceivedAmount);
+        assertEq(prl.balanceOf(users.alice.addr()), amountToMigrate);
+        assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - amountToMigrate);
     }
 
     function testFuzz_MigrateToPRL_ReceiveOn_OriginChain(uint256 amountToMigrate) external {
         amountToMigrate = _bound(amountToMigrate, 10, INITIAL_BALANCE);
-        uint256 expectedReceivedAmount = amountToMigrate.wadMul(principalMigrationContract.MIGRATION_RATIO());
 
         bytes memory extraReturnOptions = OptionsBuilder.newOptions().addExecutorLzReceiveOption(300_000, 0);
 
         MessagingFee memory destChainFees = lockBox.quoteSend(
             SendParam(
-                aEid,
-                addressToBytes32(users.alice.addr()),
-                expectedReceivedAmount,
-                expectedReceivedAmount,
-                extraReturnOptions,
-                "",
-                ""
+                aEid, addressToBytes32(users.alice.addr()), amountToMigrate, amountToMigrate, extraReturnOptions, "", ""
             ),
             false
         );
@@ -63,25 +52,18 @@ contract PeripheralMigrationContract_LzReceive_Integrations_Test is Integrations
         verifyPackets(aEid, address(peripheralPRLA));
 
         assertEq(mimo.balanceOf(users.alice.addr()), INITIAL_BALANCE - amountToMigrate);
-        assertEq(peripheralPRLA.balanceOf(users.alice.addr()), expectedReceivedAmount);
-        assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - expectedReceivedAmount);
+        assertEq(peripheralPRLA.balanceOf(users.alice.addr()), amountToMigrate);
+        assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - amountToMigrate);
     }
 
     function testFuzz_MigrateToPRL_ReceiveOn_AnotherChain(uint256 amountToMigrate) external {
         amountToMigrate = _bound(amountToMigrate, 10, INITIAL_BALANCE);
-        uint256 expectedReceivedAmount = amountToMigrate.wadMul(principalMigrationContract.MIGRATION_RATIO());
 
         bytes memory extraReturnOptions = OptionsBuilder.newOptions().addExecutorLzReceiveOption(300_000, 0);
 
         MessagingFee memory destChainFees = lockBox.quoteSend(
             SendParam(
-                bEid,
-                addressToBytes32(users.alice.addr()),
-                expectedReceivedAmount,
-                expectedReceivedAmount,
-                extraReturnOptions,
-                "",
-                ""
+                bEid, addressToBytes32(users.alice.addr()), amountToMigrate, amountToMigrate, extraReturnOptions, "", ""
             ),
             false
         );
@@ -102,8 +84,8 @@ contract PeripheralMigrationContract_LzReceive_Integrations_Test is Integrations
         verifyPackets(bEid, address(peripheralPRLB));
 
         assertEq(mimo.balanceOf(users.alice.addr()), INITIAL_BALANCE - amountToMigrate);
-        assertEq(peripheralPRLB.balanceOf(users.alice.addr()), expectedReceivedAmount);
-        assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - expectedReceivedAmount);
+        assertEq(peripheralPRLB.balanceOf(users.alice.addr()), amountToMigrate);
+        assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - amountToMigrate);
     }
 
     modifier PauseContract() {
