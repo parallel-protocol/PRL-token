@@ -38,7 +38,7 @@
     "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
     "ethers": "^5.7.2",
-    "forge-std": "github:foundry-rs/forge-std",
+    "forge-std": "github:foundry-rs/forge-std#v1.9.5",
     "fp-ts": "^2.16.9",
     "fs": "^0.0.1-security",
     "hardhat": "^2.22.10",
