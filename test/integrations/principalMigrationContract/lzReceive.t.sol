@@ -6,13 +6,11 @@ import "test/Integrations.t.sol";
 contract PrincipalMigrationContract_LzReceive_Integrations_Test is Integrations_Test {
     using OptionsBuilder for bytes;
     using OFTMsgCodec for bytes;
-    using WadRayMath for uint256;
 
     bytes32 guid = hex"0000000000000000000000000000000000000000000000000000000000000001";
 
     function testFuzz_LzReceive_MigrateToPrincipalChain(uint256 amountToMigrate) external {
         amountToMigrate = _bound(amountToMigrate, 10, INITIAL_BALANCE);
-        uint256 expectedReceivedAmount = amountToMigrate.wadMul(principalMigrationContract.MIGRATION_RATIO());
 
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200_000, 0);
         (uint256 gas, uint256 value) = OptionsHelper._parseExecutorLzReceiveOption(options);
@@ -24,8 +22,8 @@ contract PrincipalMigrationContract_LzReceive_Integrations_Test is Integrations_
         vm.startPrank(endpoint);
         principalMigrationContract.lzReceive{ value: value, gas: gas }(origin, guid, message, address(0), bytes(""));
 
-        assertEq(prl.balanceOf(users.alice.addr()), expectedReceivedAmount);
-        assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - expectedReceivedAmount);
+        assertEq(prl.balanceOf(users.alice.addr()), amountToMigrate);
+        assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - amountToMigrate);
     }
 
     function testFuzz_LzReceive_MigrateToPrincipalChain_WhenExtraMessageExistButDestEidIsMainChain(
@@ -34,7 +32,6 @@ contract PrincipalMigrationContract_LzReceive_Integrations_Test is Integrations_
         external
     {
         amountToMigrate = _bound(amountToMigrate, 10, INITIAL_BALANCE);
-        uint256 expectedReceivedAmount = amountToMigrate.wadMul(principalMigrationContract.MIGRATION_RATIO());
 
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200_000, 0);
         bytes memory extraReturnOptions = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200_000, 0);
@@ -47,8 +44,8 @@ contract PrincipalMigrationContract_LzReceive_Integrations_Test is Integrations_
         vm.startPrank(endpoint);
         principalMigrationContract.lzReceive{ value: value, gas: gas }(origin, guid, message, address(0), bytes(""));
 
-        assertEq(prl.balanceOf(users.alice.addr()), expectedReceivedAmount);
-        assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - expectedReceivedAmount);
+        assertEq(prl.balanceOf(users.alice.addr()), amountToMigrate);
+        assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - amountToMigrate);
     }
 
     function testFuzz_LzReceive_MigrateToPrincipalChain_WhenDestEidIsNotMainChainButExtraReturnOptionIsEmpty(
@@ -57,7 +54,6 @@ contract PrincipalMigrationContract_LzReceive_Integrations_Test is Integrations_
         external
     {
         amountToMigrate = _bound(amountToMigrate, 10, INITIAL_BALANCE);
-        uint256 expectedReceivedAmount = amountToMigrate.wadMul(principalMigrationContract.MIGRATION_RATIO());
 
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200_000, 0);
         (uint256 gas, uint256 value) = OptionsHelper._parseExecutorLzReceiveOption(options);
@@ -69,13 +65,13 @@ contract PrincipalMigrationContract_LzReceive_Integrations_Test is Integrations_
         vm.startPrank(endpoint);
         principalMigrationContract.lzReceive{ value: value, gas: gas }(origin, guid, message, address(0), bytes(""));
 
-        assertEq(prl.balanceOf(users.alice.addr()), expectedReceivedAmount);
-        assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - expectedReceivedAmount);
+        assertEq(prl.balanceOf(users.alice.addr()), amountToMigrate);
+        assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - amountToMigrate);
     }
 
     function testFuzz_LzReceive_MigrateToAnotherChain(uint256 amountToMigrate) external {
         amountToMigrate = _bound(amountToMigrate, 10, INITIAL_BALANCE);
-        uint256 expectedReceivedAmount = amountToMigrate.wadMul(principalMigrationContract.MIGRATION_RATIO());
+
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(450_000, 0);
         bytes memory extraReturnOptions = OptionsBuilder.newOptions().addExecutorLzReceiveOption(210_000, 0);
 
@@ -90,8 +86,8 @@ contract PrincipalMigrationContract_LzReceive_Integrations_Test is Integrations_
         principalMigrationContract.lzReceive{ value: fees.nativeFee }(origin, guid, message, address(0), bytes(""));
 
         verifyPackets(bEid, address(peripheralPRLB));
-        assertEq(peripheralPRLB.balanceOf(users.alice.addr()), expectedReceivedAmount);
-        assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - expectedReceivedAmount);
-        assertEq(prl.balanceOf(address(lockBox)), expectedReceivedAmount);
+        assertEq(peripheralPRLB.balanceOf(users.alice.addr()), amountToMigrate);
+        assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - amountToMigrate);
+        assertEq(prl.balanceOf(address(lockBox)), amountToMigrate);
     }
 }
