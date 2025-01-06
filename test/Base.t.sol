@@ -5,7 +5,6 @@ import { console2 } from "@forge-std/console2.sol";
 import { Test } from "@forge-std/Test.sol";
 
 import { ErrorsLib } from "contracts/libraries/ErrorsLib.sol";
-import { WadRayMath } from "contracts/libraries/WadRayMath.sol";
 
 import { SendParam } from "contracts/layerZero/interfaces/IOFT.sol";
 import { MessagingFee, MessagingReceipt } from "contracts/layerZero/interfaces/IOFT.sol";
@@ -19,8 +18,6 @@ import "./helpers/User.sol";
 
 /// @notice Base test contract with common logic needed by all tests.
 abstract contract Base_Test is Test, Deploys, Assertions, Defaults, Utils {
-    using WadRayMath for uint256;
-
     //----------------------------------------
     // Set-up
     //----------------------------------------

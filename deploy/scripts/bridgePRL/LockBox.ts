@@ -18,14 +18,13 @@ const deploy: DeployFunction = async (hre) => {
 
   console.log(`Network: ${hre.network.name}`);
   console.log(`Deployer: ${deployer}`);
-  const config: ConfigData = JSON.parse(readFileSync(`./deploy/config/${hre.network.name}/config.json`).toString());
 
   const endpointV2Deployment = await hre.deployments.get("EndpointV2");
   const prl = await hre.deployments.get("PRL");
 
   const contract = await deploy(contractName, {
     from: deployer,
-    args: [prl.address, endpointV2Deployment.address, config.owner],
+    args: [prl.address, endpointV2Deployment.address, deployer],
     log: true,
     skipIfAlreadyDeployed: false,
     ...GAS,

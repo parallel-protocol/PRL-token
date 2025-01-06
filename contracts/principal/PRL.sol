@@ -8,7 +8,7 @@ import { ERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/ERC2
 /// @author Cooper Labs
 /// @custom:contact security@cooperlabs.xyz
 /// @notice PRL token contract.
-contract PRL is ERC20, ERC20Permit {
+contract PRL is ERC20Permit {
     constructor(uint256 totalSupply)
         ERC20("Parallel Governance Token", "PRL")
         ERC20Permit("Parallel Governance Token")

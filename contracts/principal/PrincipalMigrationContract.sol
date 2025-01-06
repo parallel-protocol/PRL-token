@@ -15,7 +15,6 @@ import { SendParam, MessagingFee, IOFT } from "contracts/layerZero/interfaces/IO
 import { OFTMsgCodec } from "contracts/layerZero/libs/OFTMsgCodec.sol";
 
 import { ErrorsLib } from "contracts/libraries/ErrorsLib.sol";
-import { WadRayMath } from "contracts/libraries/WadRayMath.sol";
 
 /// @title PrincipalMigrationContract
 /// @author Cooper Labs
@@ -25,13 +24,10 @@ import { WadRayMath } from "contracts/libraries/WadRayMath.sol";
 /// @dev This contract will use the LockBox contract to bridge PRL to the destination chain that user specified.
 contract PrincipalMigrationContract is OAppReceiver, OAppOptionsType3, Pausable, ReentrancyGuard {
     using SafeERC20 for IERC20;
-    using WadRayMath for uint256;
     using OFTMsgCodec for bytes;
     using OFTMsgCodec for bytes32;
 
     uint256 private constant EXTRA_OPTION_START = 192;
-    /// Ratio 1 PRL = 10 MIMO
-    uint256 public constant MIGRATION_RATIO = 1e17;
     /// MIMO contract token
     IERC20 public immutable MIMO;
     /// PRL contract token
@@ -43,11 +39,18 @@ contract PrincipalMigrationContract is OAppReceiver, OAppOptionsType3, Pausable,
     // Events
     //-------------------------------------------
 
-    /// @notice Emitted when MIMO tokens are migrated to PRL tokens directly on this chain
-    /// @param receiver The address receiving the PRL tokens
-    /// @param mimoAmount The amount of MIMO tokens migrated
-    /// @param prlAmount The amount of PRL tokens received
-    event MIMOToPRLMigrated(address receiver, uint256 mimoAmount, uint256 prlAmount);
+    /// @notice Emitted when MIMO tokens are migrated to PRL tokens directly on this chain.
+    /// @param caller The address that initiate the migration.
+    /// @param receiver The address receiving the PRL tokens.
+    /// @param amount The amount of MIMO tokens migrated to PRL tokens.
+    event MIMOToPRLMigrated(address caller, address receiver, uint256 amount);
+
+    /// @notice Emitted when MIMO tokens are migrated to PRL tokens and bridged to another chain.
+    /// @param caller The address that initiate the migration.
+    /// @param receiver The address receiving the PRL tokens.
+    /// @param sendParam The SendParam struct send to the LockBox contract.
+    /// @param fee The MessagingFee struct paid for the bridging.
+    event MIMOToPRLMigratedAndBridged(address caller, address receiver, SendParam sendParam, MessagingFee fee);
 
     /// @notice Emitted when a migration message is received
     /// @param guid The unique identifier of the received message
@@ -105,20 +108,39 @@ contract PrincipalMigrationContract is OAppReceiver, OAppOptionsType3, Pausable,
     // External functions
     //-------------------------------------------
 
+    /// @notice Migrates MIMO tokens to PRL tokens
+    /// @param _amount The amount of MIMO tokens to migrate
+    function migrateToPRL(uint256 _amount, address _recipient) external whenNotPaused nonReentrant {
+        emit MIMOToPRLMigrated(msg.sender, _recipient, _amount);
+        MIMO.safeTransferFrom(msg.sender, address(this), _amount);
+        PRL.safeTransfer(_recipient, _amount);
+    }
+
+    /// @notice Migrates MIMO tokens to PRL tokens and bridges them to another chain
+    /// @param _sendParam The parameters for the send operation.
+    /// @param _fee The calculated fees for the send() operation.
+    ///      - nativeFee: The native fees.
+    ///      - lzTokenFee: The lzToken fees.
+    function migrateToPRLAndBridge(
+        SendParam calldata _sendParam,
+        MessagingFee calldata _fee
+    )
+        external
+        payable
+        whenNotPaused
+        nonReentrant
+    {
+        emit MIMOToPRLMigratedAndBridged(msg.sender, _sendParam.to.bytes32ToAddress(), _sendParam, _fee);
+        MIMO.safeTransferFrom(msg.sender, address(this), _sendParam.amount);
+        PRL.approve(address(lockBox), _sendParam.amount);
+        lockBox.send{ value: _fee.nativeFee }(_sendParam, _fee, msg.sender);
+    }
+
     /// @notice Fallback function to receive Ether
     /// @dev This function allows the contract to receive Ether. It's required for
     ///      handling native token refunds from LayerZero or any other operations
     ///      that might send Ether to this contract.
     receive() external payable { }
-
-    /// @notice Migrates MIMO tokens to PRL tokens
-    /// @param _amount The amount of MIMO tokens to migrate
-    function migrateMimoToPRL(uint256 _amount) external whenNotPaused nonReentrant {
-        uint256 prlAmount = _calculatePRLTokenAmountToReceive(_amount);
-        emit MIMOToPRLMigrated(msg.sender, _amount, prlAmount);
-        MIMO.safeTransferFrom(msg.sender, address(this), _amount);
-        PRL.safeTransfer(msg.sender, prlAmount);
-    }
 
     //-------------------------------------------
     // OnlyOwner functions
@@ -169,17 +191,19 @@ contract PrincipalMigrationContract is OAppReceiver, OAppOptionsType3, Pausable,
         override
     {
         (address receiver, uint256 amount, uint32 destEid, uint256 extraOptionsLength) = _decodeMessage(_message);
-        uint256 prlAmount = _calculatePRLTokenAmountToReceive(amount);
         emit MigrationMessageReceived(
-            _guid, _origin.srcEid, _origin.sender.bytes32ToAddress(), destEid, receiver, amount, prlAmount
+            _guid, _origin.srcEid, _origin.sender.bytes32ToAddress(), destEid, receiver, amount, amount
         );
 
         if (extraOptionsLength == 0 || destEid == endpoint.eid()) {
-            emit MIMOToPRLMigrated(receiver, amount, prlAmount);
-            PRL.safeTransfer(receiver, prlAmount);
+            emit MIMOToPRLMigrated(_origin.sender.bytes32ToAddress(), receiver, amount);
+            PRL.safeTransfer(receiver, amount);
         } else {
-            SendParam memory sendParam = _buildSendParam(_message, receiver, prlAmount, destEid, extraOptionsLength);
-            PRL.approve(address(lockBox), prlAmount);
+            SendParam memory sendParam = _buildSendParam(_message, receiver, amount, destEid, extraOptionsLength);
+            emit MIMOToPRLMigratedAndBridged(
+                _origin.sender.bytes32ToAddress(), receiver, sendParam, MessagingFee(msg.value, 0)
+            );
+            PRL.approve(address(lockBox), amount);
             lockBox.send{ value: msg.value }(sendParam, MessagingFee(msg.value, 0), payable(address(this)));
         }
     }
@@ -222,12 +246,5 @@ contract PrincipalMigrationContract is OAppReceiver, OAppOptionsType3, Pausable,
         bytes memory _options = _encodedMessage[EXTRA_OPTION_START:EXTRA_OPTION_START + _extraOptionsLength];
         return
             SendParam(_destEid, OFTMsgCodec.addressToBytes32(_receiver), _finalAmount, _finalAmount, _options, "", "");
-    }
-
-    /// @notice Calculates the amount of PRL tokens to be received for a given amount of MIMO tokens
-    /// @param _mimoAmount The amount of MIMO tokens
-    /// @return prlAmount The calculated amount of PRL tokens
-    function _calculatePRLTokenAmountToReceive(uint256 _mimoAmount) internal pure returns (uint256 prlAmount) {
-        prlAmount = _mimoAmount.wadMul(MIGRATION_RATIO);
     }
 }

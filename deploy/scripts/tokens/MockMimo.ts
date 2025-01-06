@@ -1,11 +1,10 @@
 import assert from "assert";
-import { parseEther } from "ethers";
 
 import { type DeployFunction } from "hardhat-deploy/types";
 
 import { GAS } from "../../utils";
 
-const contractName = "ERC20Mock";
+const contractName = "Mimo";
 const deploy: DeployFunction = async (hre) => {
   const { getNamedAccounts, deployments } = hre;
 
@@ -18,7 +17,7 @@ const deploy: DeployFunction = async (hre) => {
   console.log(`Network: ${hre.network.name}`);
   console.log(`Deployer: ${deployer}`);
 
-  const contract = await deploy(contractName, {
+  const contract = await deploy("ERC20Mock", {
     from: deployer,
     args: ["Mimo", "MIMO", 18],
     log: true,
