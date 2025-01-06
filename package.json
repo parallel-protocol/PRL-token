@@ -17,7 +17,7 @@
     "OApp:wire:testnet:bridge": "npx hardhat lz:oapp:wire --oapp-config layerZero/testnet/prlBridge.config.ts",
     "test": "forge test",
     "test:coverage": "forge coverage --ir-minimum",
-    "test:coverage:report": "forge coverage --ir-minimum --report lcov && lcov --remove lcov.info -o lcov.info \"test/*\" \"node_modules/*\" && genhtml lcov.info -o coverage",
+    "test:coverage:report": "forge coverage --ir-minimum --report lcov && lcov --remove lcov.info -o lcov.info \"test/*\" && genhtml lcov.info -o coverage",
     "verify": "npx hardhat etherscan-verify --sleep"
   },
   "dependencies": {
