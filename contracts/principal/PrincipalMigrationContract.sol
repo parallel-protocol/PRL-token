@@ -204,7 +204,7 @@ contract PrincipalMigrationContract is OAppReceiver, OAppOptionsType3, Pausable,
                 _origin.sender.bytes32ToAddress(), receiver, sendParam, MessagingFee(msg.value, 0)
             );
             PRL.approve(address(lockBox), amount);
-            lockBox.send{ value: msg.value }(sendParam, MessagingFee(msg.value, 0), payable(address(this)));
+            lockBox.send{ value: msg.value }(sendParam, MessagingFee(msg.value, 0), receiver);
         }
     }
 
