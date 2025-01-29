@@ -102,7 +102,6 @@ contract PeripheralMigrationContract is OAppSender, OAppOptionsType3, Pausable {
         bytes memory options =
             combineOptions(_dstEid, _extraSendOptions.length > 0 ? SEND_AND_MIGRATE : SEND, _extraSendOptions);
 
-        emit MigrationMessageSent(msgReceipt.guid, _dstEid, msg.sender, _receiver, fee, _amount);
         MIMO.safeTransferFrom(msg.sender, address(this), _amount);
         msgReceipt = _lzSend(
             mainEid,
@@ -113,6 +112,7 @@ contract PeripheralMigrationContract is OAppSender, OAppOptionsType3, Pausable {
             // Refund address in case of failed source message.
             payable(msg.sender)
         );
+        emit MigrationMessageSent(msgReceipt.guid, _dstEid, msg.sender, _receiver, fee, _amount);
     }
 
     /// @notice Returns the estimated messaging fee for a given message.
