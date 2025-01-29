@@ -83,8 +83,8 @@ contract PeripheralPRL is OFT, ERC20Permit, Pausable {
         returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt)
     {
         // Approve the spending using EIP-2612 permit
-        permit(msg.sender, address(this), _sendParam.amount, _deadline, _v, _r, _s);
-        // Execute the send operation
+        // @dev using try catch to avoid reverting the transaction in case of front-running
+        try this.permit(msg.sender, address(this), _sendParam.amount, _deadline, _v, _r, _s) { } catch { }
         return super.send(_sendParam, _fee, _refundAddress);
     }
 
