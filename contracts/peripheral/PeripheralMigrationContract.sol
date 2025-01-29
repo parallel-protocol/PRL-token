@@ -135,7 +135,7 @@ contract PeripheralMigrationContract is OAppSender, OAppOptionsType3, Pausable {
     {
         bytes memory payload = _encodeMessage(_receiver, _amount, _dstEid, _extraReturnOptions);
         bytes memory options =
-            combineOptions(mainEid, _extraSendOptions.length > 0 ? SEND_AND_MIGRATE : SEND, _extraSendOptions);
+            combineOptions(_dstEid, _extraSendOptions.length > 0 ? SEND_AND_MIGRATE : SEND, _extraSendOptions);
         fee = _quote(mainEid, payload, options, false);
     }
 
