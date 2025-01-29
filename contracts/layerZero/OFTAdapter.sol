@@ -37,6 +37,13 @@ abstract contract OFTAdapter is OFTCore {
         return address(innerToken);
     }
 
+    /// @notice Indicates whether the OFT contract requires approval of the 'token()' to send.
+    /// @return requiresApproval Needs approval of the underlying token implementation.
+    /// @dev In the case of OFT where the contract IS the token, approval is NOT required.
+    function approvalRequired() external pure virtual returns (bool) {
+        return true;
+    }
+
     /// @dev Burns tokens from the sender's specified balance, ie. pull method.
     /// @param _from The address to debit from.
     /// @param _amount The amount of tokens to send.
