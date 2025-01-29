@@ -133,7 +133,7 @@ contract PrincipalMigrationContract is OAppReceiver, OAppOptionsType3, Pausable,
         emit MIMOToPRLMigratedAndBridged(msg.sender, _sendParam.to.bytes32ToAddress(), _sendParam, _fee);
         MIMO.safeTransferFrom(msg.sender, address(this), _sendParam.amount);
         PRL.approve(address(lockBox), _sendParam.amount);
-        lockBox.send{ value: _fee.nativeFee }(_sendParam, _fee, msg.sender);
+        lockBox.send{ value: msg.value }(_sendParam, _fee, msg.sender);
     }
 
     /// @notice Fallback function to receive Ether
