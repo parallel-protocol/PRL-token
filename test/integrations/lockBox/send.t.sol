@@ -11,25 +11,24 @@ contract LockBox_Send_Integrations_Test is Integrations_Test {
 
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200_000, 0);
 
-        address alice = users.alice.addr();
-        deal(address(prl), alice, amountToMigrate);
+        deal(address(prl), users.alice.addr, amountToMigrate);
 
         SendParam memory sendParam =
-            SendParam(aEid, addressToBytes32(users.alice.addr()), amountToMigrate, amountToMigrate, options, "", "");
+            SendParam(aEid, addressToBytes32(users.alice.addr), amountToMigrate, amountToMigrate, options, "", "");
         MessagingFee memory fees = lockBox.quoteSend(sendParam, false);
 
-        vm.startPrank(alice);
+        vm.startPrank(users.alice.addr);
         prl.approve(address(lockBox), amountToMigrate);
-        lockBox.send{ value: fees.nativeFee }(sendParam, fees, alice);
+        lockBox.send{ value: fees.nativeFee }(sendParam, fees, users.alice.addr);
 
         verifyPackets(aEid, address(peripheralPRLA));
 
-        assertEq(prl.balanceOf(alice), 0);
-        assertEq(peripheralPRLA.balanceOf(alice), amountToMigrate);
+        assertEq(prl.balanceOf(users.alice.addr), 0);
+        assertEq(peripheralPRLA.balanceOf(users.alice.addr), amountToMigrate);
     }
 
     modifier PauseContract() {
-        startPrank(users.owner);
+        vm.startPrank(users.owner.addr);
         lockBox.pause();
         _;
     }
@@ -37,22 +36,15 @@ contract LockBox_Send_Integrations_Test is Integrations_Test {
     function test_LockBox_Send_RevertWhen_Paused() external PauseContract {
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200_000, 0);
 
-        address alice = users.alice.addr();
-        deal(address(prl), alice, DEFAULT_AMOUNT_MIGRATED);
+        deal(address(prl), users.alice.addr, DEFAULT_AMOUNT_MIGRATED);
 
         SendParam memory sendParam = SendParam(
-            aEid,
-            addressToBytes32(users.alice.addr()),
-            DEFAULT_AMOUNT_MIGRATED,
-            DEFAULT_AMOUNT_MIGRATED,
-            options,
-            "",
-            ""
+            aEid, addressToBytes32(users.alice.addr), DEFAULT_AMOUNT_MIGRATED, DEFAULT_AMOUNT_MIGRATED, options, "", ""
         );
         MessagingFee memory fees = lockBox.quoteSend(sendParam, false);
 
-        vm.startPrank(alice);
+        vm.startPrank(users.alice.addr);
         vm.expectRevert(abi.encodeWithSelector(Pausable.EnforcedPause.selector));
-        lockBox.send{ value: fees.nativeFee }(sendParam, fees, alice);
+        lockBox.send{ value: fees.nativeFee }(sendParam, fees, users.alice.addr);
     }
 }

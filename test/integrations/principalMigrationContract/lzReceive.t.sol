@@ -16,13 +16,13 @@ contract PrincipalMigrationContract_LzReceive_Integrations_Test is Integrations_
         (uint256 gas, uint256 value) = OptionsHelper._parseExecutorLzReceiveOption(options);
 
         Origin memory origin = Origin(aEid, addressToBytes32(address(peripheralMigrationContractA)), 1);
-        bytes memory message = _buildMessage(users.alice.addr(), amountToMigrate, mainEid, "");
+        bytes memory message = _buildMessage(users.alice.addr, amountToMigrate, mainEid, "");
 
         address endpoint = address(principalMigrationContract.endpoint());
         vm.startPrank(endpoint);
         principalMigrationContract.lzReceive{ value: value, gas: gas }(origin, guid, message, address(0), bytes(""));
 
-        assertEq(prl.balanceOf(users.alice.addr()), amountToMigrate);
+        assertEq(prl.balanceOf(users.alice.addr), amountToMigrate);
         assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - amountToMigrate);
     }
 
@@ -38,13 +38,13 @@ contract PrincipalMigrationContract_LzReceive_Integrations_Test is Integrations_
         (uint256 gas, uint256 value) = OptionsHelper._parseExecutorLzReceiveOption(options);
 
         Origin memory origin = Origin(aEid, addressToBytes32(address(peripheralMigrationContractA)), 1);
-        bytes memory message = _buildMessage(users.alice.addr(), amountToMigrate, mainEid, extraReturnOptions);
+        bytes memory message = _buildMessage(users.alice.addr, amountToMigrate, mainEid, extraReturnOptions);
 
         address endpoint = address(principalMigrationContract.endpoint());
         vm.startPrank(endpoint);
         principalMigrationContract.lzReceive{ value: value, gas: gas }(origin, guid, message, address(0), bytes(""));
 
-        assertEq(prl.balanceOf(users.alice.addr()), amountToMigrate);
+        assertEq(prl.balanceOf(users.alice.addr), amountToMigrate);
         assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - amountToMigrate);
     }
 
@@ -59,13 +59,13 @@ contract PrincipalMigrationContract_LzReceive_Integrations_Test is Integrations_
         (uint256 gas, uint256 value) = OptionsHelper._parseExecutorLzReceiveOption(options);
 
         Origin memory origin = Origin(aEid, addressToBytes32(address(peripheralMigrationContractA)), 1);
-        bytes memory message = _buildMessage(users.alice.addr(), amountToMigrate, bEid, "");
+        bytes memory message = _buildMessage(users.alice.addr, amountToMigrate, bEid, "");
 
         address endpoint = address(principalMigrationContract.endpoint());
         vm.startPrank(endpoint);
         principalMigrationContract.lzReceive{ value: value, gas: gas }(origin, guid, message, address(0), bytes(""));
 
-        assertEq(prl.balanceOf(users.alice.addr()), amountToMigrate);
+        assertEq(prl.balanceOf(users.alice.addr), amountToMigrate);
         assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - amountToMigrate);
     }
 
@@ -76,17 +76,17 @@ contract PrincipalMigrationContract_LzReceive_Integrations_Test is Integrations_
         bytes memory extraReturnOptions = OptionsBuilder.newOptions().addExecutorLzReceiveOption(210_000, 0);
 
         MessagingFee memory fees =
-            peripheralMigrationContractA.quote(bEid, users.alice.addr(), amountToMigrate, options, extraReturnOptions);
+            peripheralMigrationContractA.quote(bEid, users.alice.addr, amountToMigrate, options, extraReturnOptions);
 
         Origin memory origin = Origin(aEid, addressToBytes32(address(peripheralMigrationContractA)), 1);
-        bytes memory message = _buildMessage(users.alice.addr(), amountToMigrate, bEid, extraReturnOptions);
+        bytes memory message = _buildMessage(users.alice.addr, amountToMigrate, bEid, extraReturnOptions);
         address endpoint = address(principalMigrationContract.endpoint());
         vm.startPrank(endpoint);
         vm.deal({ account: endpoint, newBalance: fees.nativeFee });
         principalMigrationContract.lzReceive{ value: fees.nativeFee }(origin, guid, message, address(0), bytes(""));
 
         verifyPackets(bEid, address(peripheralPRLB));
-        assertEq(peripheralPRLB.balanceOf(users.alice.addr()), amountToMigrate);
+        assertEq(peripheralPRLB.balanceOf(users.alice.addr), amountToMigrate);
         assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - amountToMigrate);
         assertEq(prl.balanceOf(address(lockBox)), amountToMigrate);
     }

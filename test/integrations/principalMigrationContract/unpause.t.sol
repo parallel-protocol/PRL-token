@@ -9,13 +9,13 @@ import "test/Integrations.t.sol";
 contract PrincipalMigrationContract_UnPause_Integrations_Test is Integrations_Test {
     function setUp() public virtual override {
         super.setUp();
-        address owner = users.owner.addr();
+        address owner = users.owner.addr;
         vm.startPrank(owner);
         principalMigrationContract.pause();
     }
 
     function test_PrincipalMigrationContract_UnPause() external {
-        address owner = users.owner.addr();
+        address owner = users.owner.addr;
         vm.startPrank(owner);
         vm.expectEmit(address(principalMigrationContract));
         emit Pausable.Unpaused(owner);
@@ -24,7 +24,7 @@ contract PrincipalMigrationContract_UnPause_Integrations_Test is Integrations_Te
     }
 
     function test_PrincipalMigrationContract_RevertWhen_CallerNotOwner() external {
-        address hacker = users.hacker.addr();
+        address hacker = users.hacker.addr;
         vm.startPrank(hacker);
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, hacker));
         principalMigrationContract.unpause();
