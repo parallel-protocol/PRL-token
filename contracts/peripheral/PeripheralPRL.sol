@@ -54,6 +54,7 @@ contract PeripheralPRL is OFT, ERC20Permit, Pausable {
         whenNotPaused
         returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt)
     {
+        if (_refundAddress == address(0)) revert ErrorsLib.AddressZero();
         return super.send(_sendParam, _fee, _refundAddress);
     }
 

@@ -26,7 +26,7 @@ contract PrincipalMigrationContract_MigrateToPRLAndBridge_Integrations_Test is I
         emit PrincipalMigrationContract.MIMOToPRLMigratedAndBridged(
             users.alice.addr(), users.alice.addr(), sendParam, fees
         );
-        principalMigrationContract.migrateToPRLAndBridge{ value: fees.nativeFee }(sendParam, fees);
+        principalMigrationContract.migrateToPRLAndBridge{ value: fees.nativeFee }(sendParam, fees, users.alice.addr());
 
         verifyPackets(aEid, address(peripheralPRLA));
 
@@ -54,7 +54,7 @@ contract PrincipalMigrationContract_MigrateToPRLAndBridge_Integrations_Test is I
         emit PrincipalMigrationContract.MIMOToPRLMigratedAndBridged(
             users.alice.addr(), users.alice.addr(), sendParam, fees
         );
-        principalMigrationContract.migrateToPRLAndBridge{ value: fees.nativeFee }(sendParam, fees);
+        principalMigrationContract.migrateToPRLAndBridge{ value: fees.nativeFee }(sendParam, fees, users.alice.addr());
 
         verifyPackets(aEid, address(peripheralPRLA));
 
@@ -71,6 +71,7 @@ contract PrincipalMigrationContract_MigrateToPRLAndBridge_Integrations_Test is I
     }
 
     function test_MigrateToPRLAndBridge_RevertWhen_Paused() external PauseContract {
+        address alice = users.alice.addr();
         SendParam memory sendParam = SendParam(
             aEid,
             addressToBytes32(users.alice.addr()),
@@ -83,6 +84,22 @@ contract PrincipalMigrationContract_MigrateToPRLAndBridge_Integrations_Test is I
         MessagingFee memory fees = lockBox.quoteSend(sendParam, false);
         startPrank(users.alice);
         vm.expectRevert(abi.encodeWithSelector(Pausable.EnforcedPause.selector));
-        principalMigrationContract.migrateToPRLAndBridge{ value: fees.nativeFee }(sendParam, fees);
+        principalMigrationContract.migrateToPRLAndBridge{ value: fees.nativeFee }(sendParam, fees, alice);
+    }
+
+    function test_MigrateToPRLAndBridge_RevertWhen_RefundAddressIsZero() external {
+        SendParam memory sendParam = SendParam(
+            aEid,
+            addressToBytes32(users.alice.addr()),
+            DEFAULT_AMOUNT_MIGRATED,
+            DEFAULT_AMOUNT_MIGRATED,
+            options,
+            "",
+            ""
+        );
+        MessagingFee memory fees = lockBox.quoteSend(sendParam, false);
+        startPrank(users.alice);
+        vm.expectRevert(abi.encodeWithSelector(ErrorsLib.AddressZero.selector));
+        principalMigrationContract.migrateToPRLAndBridge{ value: fees.nativeFee }(sendParam, fees, address(0));
     }
 }

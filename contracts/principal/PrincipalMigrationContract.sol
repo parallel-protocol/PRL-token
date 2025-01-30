@@ -123,17 +123,19 @@ contract PrincipalMigrationContract is OAppReceiver, OAppOptionsType3, Pausable,
     ///      - lzTokenFee: The lzToken fees.
     function migrateToPRLAndBridge(
         SendParam calldata _sendParam,
-        MessagingFee calldata _fee
+        MessagingFee calldata _fee,
+        address _refundAddress
     )
         external
         payable
         whenNotPaused
         nonReentrant
     {
+        if (_refundAddress == address(0)) revert ErrorsLib.AddressZero();
         emit MIMOToPRLMigratedAndBridged(msg.sender, _sendParam.to.bytes32ToAddress(), _sendParam, _fee);
         MIMO.safeTransferFrom(msg.sender, address(this), _sendParam.amount);
         PRL.approve(address(lockBox), _sendParam.amount);
-        lockBox.send{ value: msg.value }(_sendParam, _fee, msg.sender);
+        lockBox.send{ value: msg.value }(_sendParam, _fee, _refundAddress);
     }
 
     /// @notice Fallback function to receive Ether

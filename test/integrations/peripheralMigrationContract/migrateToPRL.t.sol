@@ -17,7 +17,7 @@ contract PeripheralMigrationContract_LzReceive_Integrations_Test is Integrations
         startPrank(users.alice);
         mimo.approve(address(peripheralMigrationContractA), amountToMigrate);
         peripheralMigrationContractA.migrateToPRL{ value: fees.nativeFee }(
-            users.alice.addr(), amountToMigrate, mainEid, options, ""
+            users.alice.addr(), amountToMigrate, mainEid, users.alice.addr(), options, ""
         );
         verifyPackets(mainEid, addressToBytes32(address(principalMigrationContract)));
 
@@ -46,7 +46,7 @@ contract PeripheralMigrationContract_LzReceive_Integrations_Test is Integrations
         startPrank(users.alice);
         mimo.approve(address(peripheralMigrationContractA), amountToMigrate);
         peripheralMigrationContractA.migrateToPRL{ value: fees.nativeFee + destChainFees.nativeFee }(
-            users.alice.addr(), amountToMigrate, aEid, options, extraReturnOptions
+            users.alice.addr(), amountToMigrate, aEid, users.alice.addr(), options, extraReturnOptions
         );
         verifyPackets(mainEid, address(principalMigrationContract));
         verifyPackets(aEid, address(peripheralPRLA));
@@ -77,7 +77,7 @@ contract PeripheralMigrationContract_LzReceive_Integrations_Test is Integrations
 
         mimo.approve(address(peripheralMigrationContractA), amountToMigrate);
         peripheralMigrationContractA.migrateToPRL{ value: fees.nativeFee + destChainFees.nativeFee }(
-            users.alice.addr(), amountToMigrate, bEid, options, extraReturnOptions
+            users.alice.addr(), amountToMigrate, bEid, users.alice.addr(), options, extraReturnOptions
         );
 
         verifyPackets(mainEid, address(principalMigrationContract));
@@ -106,7 +106,23 @@ contract PeripheralMigrationContract_LzReceive_Integrations_Test is Integrations
         vm.startPrank(alice);
         vm.expectRevert(abi.encodeWithSelector(Pausable.EnforcedPause.selector));
         peripheralMigrationContractA.migrateToPRL{ value: fees.nativeFee }(
-            alice, DEFAULT_AMOUNT_MIGRATED, mainEid, options, extraReturnOptions
+            alice, DEFAULT_AMOUNT_MIGRATED, mainEid, alice, options, extraReturnOptions
+        );
+    }
+
+    function test_MigrateToPRL_RevertWhen_RefundAddressIsZero() external {
+        address alice = users.alice.addr();
+
+        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(450_000, 0);
+        bytes memory extraReturnOptions = OptionsBuilder.newOptions().addExecutorLzReceiveOption(210_000, 0);
+
+        MessagingFee memory fees =
+            peripheralMigrationContractA.quote(mainEid, alice, DEFAULT_AMOUNT_MIGRATED, options, extraReturnOptions);
+
+        vm.startPrank(alice);
+        vm.expectRevert(abi.encodeWithSelector(ErrorsLib.AddressZero.selector));
+        peripheralMigrationContractA.migrateToPRL{ value: fees.nativeFee }(
+            alice, DEFAULT_AMOUNT_MIGRATED, mainEid, address(0), options, extraReturnOptions
         );
     }
 }
