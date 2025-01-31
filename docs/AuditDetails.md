@@ -88,8 +88,8 @@ Read the [README](../README.md) for more context.
 
 ### Ownable address
 
-The owner defined on every contract utilizing OpenZeppelin's Ownable contract will be the AccessManager contract.
-Specific roles will be defined to call contract function with delay.
+The owner defined on every contract using OpenZeppelin's Ownable contract is the AccessManager contract. Specific roles
+will be defined to call contract functions with a delay.
 
 ## Tests
 
