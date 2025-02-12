@@ -117,13 +117,11 @@ contract PrincipalMigrationContract is OAppReceiver, OAppOptionsType3, Pausable,
     }
 
     /// @notice Migrates MIMO tokens to PRL tokens and bridges them to another chain
+    /// @dev This function is payable to pay for the messaging fee.
     /// @param _sendParam The parameters for the send operation.
-    /// @param _fee The calculated fees for the send() operation.
-    ///      - nativeFee: The native fees.
-    ///      - lzTokenFee: The lzToken fees.
+    /// @param _refundAddress The address to refund the native gas in case of failed source message.
     function migrateToPRLAndBridge(
         SendParam calldata _sendParam,
-        MessagingFee calldata _fee,
         address _refundAddress
     )
         external
@@ -132,10 +130,12 @@ contract PrincipalMigrationContract is OAppReceiver, OAppOptionsType3, Pausable,
         nonReentrant
     {
         if (_refundAddress == address(0)) revert ErrorsLib.AddressZero();
-        emit MIMOToPRLMigratedAndBridged(msg.sender, _sendParam.to.bytes32ToAddress(), _sendParam, _fee);
+        emit MIMOToPRLMigratedAndBridged(
+            msg.sender, _sendParam.to.bytes32ToAddress(), _sendParam, MessagingFee(msg.value, 0)
+        );
         MIMO.safeTransferFrom(msg.sender, address(this), _sendParam.amount);
         PRL.approve(address(lockBox), _sendParam.amount);
-        lockBox.send{ value: msg.value }(_sendParam, _fee, _refundAddress);
+        lockBox.send{ value: msg.value }(_sendParam, MessagingFee(msg.value, 0), _refundAddress);
     }
 
     /// @notice Fallback function to receive Ether
