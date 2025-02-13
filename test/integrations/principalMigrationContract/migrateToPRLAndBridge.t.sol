@@ -24,7 +24,7 @@ contract PrincipalMigrationContract_MigrateToPRLAndBridge_Integrations_Test is I
 
         vm.expectEmit(true, true, false, true);
         emit PrincipalMigrationContract.MIMOToPRLMigratedAndBridged(users.alice.addr, users.alice.addr, sendParam, fees);
-        principalMigrationContract.migrateToPRLAndBridge{ value: fees.nativeFee }(sendParam, fees, users.alice.addr);
+        principalMigrationContract.migrateToPRLAndBridge{ value: fees.nativeFee }(sendParam, users.alice.addr);
 
         verifyPackets(aEid, address(peripheralPRLA));
 
@@ -50,7 +50,7 @@ contract PrincipalMigrationContract_MigrateToPRLAndBridge_Integrations_Test is I
 
         vm.expectEmit(true, true, false, true);
         emit PrincipalMigrationContract.MIMOToPRLMigratedAndBridged(users.alice.addr, users.alice.addr, sendParam, fees);
-        principalMigrationContract.migrateToPRLAndBridge{ value: fees.nativeFee }(sendParam, fees, users.alice.addr);
+        principalMigrationContract.migrateToPRLAndBridge{ value: fees.nativeFee }(sendParam, users.alice.addr);
 
         verifyPackets(aEid, address(peripheralPRLA));
 
@@ -73,7 +73,7 @@ contract PrincipalMigrationContract_MigrateToPRLAndBridge_Integrations_Test is I
         MessagingFee memory fees = lockBox.quoteSend(sendParam, false);
         vm.startPrank(users.alice.addr);
         vm.expectRevert(abi.encodeWithSelector(Pausable.EnforcedPause.selector));
-        principalMigrationContract.migrateToPRLAndBridge{ value: fees.nativeFee }(sendParam, fees, users.alice.addr);
+        principalMigrationContract.migrateToPRLAndBridge{ value: fees.nativeFee }(sendParam, users.alice.addr);
     }
 
     function test_MigrateToPRLAndBridge_RevertWhen_RefundAddressIsZero() external {
@@ -83,6 +83,6 @@ contract PrincipalMigrationContract_MigrateToPRLAndBridge_Integrations_Test is I
         MessagingFee memory fees = lockBox.quoteSend(sendParam, false);
         vm.startPrank(users.alice.addr);
         vm.expectRevert(abi.encodeWithSelector(ErrorsLib.AddressZero.selector));
-        principalMigrationContract.migrateToPRLAndBridge{ value: fees.nativeFee }(sendParam, fees, address(0));
+        principalMigrationContract.migrateToPRLAndBridge{ value: fees.nativeFee }(sendParam, address(0));
     }
 }
