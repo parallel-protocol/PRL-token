@@ -2,10 +2,11 @@
 pragma solidity 0.8.25;
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Pausable } from "@openzeppelin/contracts/utils/Pausable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import { Address } from "@openzeppelin/contracts/utils/Address.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import { OAppReceiver, Origin } from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/OAppReceiver.sol";
 import { OAppCore } from "@layerzerolabs/lz-evm-oapp-v2/contracts/oapp/OAppCore.sol";
@@ -26,6 +27,7 @@ contract PrincipalMigrationContract is OAppReceiver, OAppOptionsType3, Pausable,
     using SafeERC20 for IERC20;
     using OFTMsgCodec for bytes;
     using OFTMsgCodec for bytes32;
+    using Address for *;
 
     uint256 private constant EXTRA_OPTION_START = 192;
     /// MIMO contract token
@@ -196,17 +198,22 @@ contract PrincipalMigrationContract is OAppReceiver, OAppOptionsType3, Pausable,
         emit MigrationMessageReceived(
             _guid, _origin.srcEid, _origin.sender.bytes32ToAddress(), destEid, receiver, amount, amount
         );
-
         if (extraOptionsLength == 0 || destEid == endpoint.eid()) {
             emit MIMOToPRLMigrated(_origin.sender.bytes32ToAddress(), receiver, amount);
             PRL.safeTransfer(receiver, amount);
         } else {
             SendParam memory sendParam = _buildSendParam(_message, receiver, amount, destEid, extraOptionsLength);
-            emit MIMOToPRLMigratedAndBridged(
-                _origin.sender.bytes32ToAddress(), receiver, sendParam, MessagingFee(msg.value, 0)
-            );
             PRL.approve(address(lockBox), amount);
-            lockBox.send{ value: msg.value }(sendParam, MessagingFee(msg.value, 0), receiver);
+            try lockBox.send{ value: msg.value }(sendParam, MessagingFee(msg.value, 0), receiver) {
+                emit MIMOToPRLMigratedAndBridged(
+                    _origin.sender.bytes32ToAddress(), receiver, sendParam, MessagingFee(msg.value, 0)
+                );
+            } catch {
+                emit MIMOToPRLMigrated(_origin.sender.bytes32ToAddress(), receiver, amount);
+                PRL.approve(address(lockBox), 0);
+                PRL.safeTransfer(receiver, amount);
+                payable(receiver).sendValue(msg.value);
+            }
         }
     }
 
