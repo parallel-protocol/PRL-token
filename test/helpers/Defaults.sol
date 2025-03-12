@@ -10,10 +10,9 @@ contract Defaults {
     //----------------------------------------
 
     uint256 public constant ONE_DAY_IN_SECONDS = 1 days;
-    uint256 public constant DEFAULT_PRL_SUPPLY = 100_000_000e18;
+    uint256 public constant DEFAULT_PRL_SUPPLY = 1_000_000_000e18;
     uint256 public constant INITIAL_BALANCE = 100_000e18;
     uint256 public constant DEFAULT_AMOUNT_MIGRATED = 1000e18;
-    uint256 public constant DEFAULT_EXPECTED_AMOUNT_RECEIVED = 100e18;
 
     uint32 public constant mainEid = 1;
     uint32 public constant aEid = 2;

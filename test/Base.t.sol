@@ -2,10 +2,9 @@
 pragma solidity 0.8.25;
 
 import { console2 } from "@forge-std/console2.sol";
-import { Test } from "@forge-std/Test.sol";
+import { Test, Vm } from "@forge-std/Test.sol";
 
 import { ErrorsLib } from "contracts/libraries/ErrorsLib.sol";
-import { WadRayMath } from "contracts/libraries/WadRayMath.sol";
 
 import { SendParam } from "contracts/layerZero/interfaces/IOFT.sol";
 import { MessagingFee, MessagingReceipt } from "contracts/layerZero/interfaces/IOFT.sol";
@@ -15,12 +14,9 @@ import "./helpers/Defaults.sol";
 import "./helpers/Assertions.sol";
 import "./helpers/Utils.sol";
 import "./helpers/SigUtils.sol";
-import "./helpers/User.sol";
 
 /// @notice Base test contract with common logic needed by all tests.
 abstract contract Base_Test is Test, Deploys, Assertions, Defaults, Utils {
-    using WadRayMath for uint256;
-
     //----------------------------------------
     // Set-up
     //----------------------------------------
@@ -39,11 +35,11 @@ abstract contract Base_Test is Test, Deploys, Assertions, Defaults, Utils {
     }
 
     /// @dev Generates a user, labels its address, and funds it with test assets.
-    function _createUser(string memory name, bool setTokenBalance) internal returns (User user) {
-        user = new User(name);
-        vm.deal({ account: user.addr(), newBalance: INITIAL_BALANCE });
+    function _createUser(string memory name, bool setTokenBalance) internal returns (Vm.Wallet memory user) {
+        user = vm.createWallet(name);
+        vm.deal({ account: user.addr, newBalance: INITIAL_BALANCE });
         if (setTokenBalance) {
-            mimo.mint(user.addr(), INITIAL_BALANCE);
+            mimo.mint(user.addr, INITIAL_BALANCE);
         }
     }
 

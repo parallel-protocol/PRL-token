@@ -26,21 +26,31 @@ import type {
 export interface ERC20MockInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "DOMAIN_SEPARATOR"
       | "allowance"
       | "approve"
       | "balanceOf"
       | "burn"
       | "decimals"
+      | "eip712Domain"
       | "mint"
       | "name"
+      | "nonces"
+      | "permit"
       | "symbol"
       | "totalSupply"
       | "transfer"
       | "transferFrom"
   ): FunctionFragment;
 
-  getEvent(nameOrSignatureOrTopic: "Approval" | "Transfer"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "Approval" | "EIP712DomainChanged" | "Transfer"
+  ): EventFragment;
 
+  encodeFunctionData(
+    functionFragment: "DOMAIN_SEPARATOR",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "allowance",
     values: [AddressLike, AddressLike]
@@ -59,10 +69,27 @@ export interface ERC20MockInterface extends Interface {
   ): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "eip712Domain",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "mint",
     values: [AddressLike, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(functionFragment: "nonces", values: [AddressLike]): string;
+  encodeFunctionData(
+    functionFragment: "permit",
+    values: [
+      AddressLike,
+      AddressLike,
+      BigNumberish,
+      BigNumberish,
+      BigNumberish,
+      BytesLike,
+      BytesLike
+    ]
+  ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
@@ -77,13 +104,23 @@ export interface ERC20MockInterface extends Interface {
     values: [AddressLike, AddressLike, BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "DOMAIN_SEPARATOR",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "eip712Domain",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -108,6 +145,16 @@ export namespace ApprovalEvent {
     spender: string;
     value: bigint;
   }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace EIP712DomainChangedEvent {
+  export type InputTuple = [];
+  export type OutputTuple = [];
+  export interface OutputObject {}
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
   export type Log = TypedEventLog<Event>;
@@ -175,6 +222,8 @@ export interface ERC20Mock extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  DOMAIN_SEPARATOR: TypedContractMethod<[], [string], "view">;
+
   allowance: TypedContractMethod<
     [owner: AddressLike, spender: AddressLike],
     [bigint],
@@ -197,6 +246,22 @@ export interface ERC20Mock extends BaseContract {
 
   decimals: TypedContractMethod<[], [bigint], "view">;
 
+  eip712Domain: TypedContractMethod<
+    [],
+    [
+      [string, string, string, bigint, string, string, bigint[]] & {
+        fields: string;
+        name: string;
+        version: string;
+        chainId: bigint;
+        verifyingContract: string;
+        salt: string;
+        extensions: bigint[];
+      }
+    ],
+    "view"
+  >;
+
   mint: TypedContractMethod<
     [to: AddressLike, amount: BigNumberish],
     [void],
@@ -204,6 +269,22 @@ export interface ERC20Mock extends BaseContract {
   >;
 
   name: TypedContractMethod<[], [string], "view">;
+
+  nonces: TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+
+  permit: TypedContractMethod<
+    [
+      owner: AddressLike,
+      spender: AddressLike,
+      value: BigNumberish,
+      deadline: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike
+    ],
+    [void],
+    "nonpayable"
+  >;
 
   symbol: TypedContractMethod<[], [string], "view">;
 
@@ -225,6 +306,9 @@ export interface ERC20Mock extends BaseContract {
     key: string | FunctionFragment
   ): T;
 
+  getFunction(
+    nameOrSignature: "DOMAIN_SEPARATOR"
+  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "allowance"
   ): TypedContractMethod<
@@ -253,6 +337,23 @@ export interface ERC20Mock extends BaseContract {
     nameOrSignature: "decimals"
   ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
+    nameOrSignature: "eip712Domain"
+  ): TypedContractMethod<
+    [],
+    [
+      [string, string, string, bigint, string, string, bigint[]] & {
+        fields: string;
+        name: string;
+        version: string;
+        chainId: bigint;
+        verifyingContract: string;
+        salt: string;
+        extensions: bigint[];
+      }
+    ],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "mint"
   ): TypedContractMethod<
     [to: AddressLike, amount: BigNumberish],
@@ -262,6 +363,24 @@ export interface ERC20Mock extends BaseContract {
   getFunction(
     nameOrSignature: "name"
   ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "nonces"
+  ): TypedContractMethod<[owner: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "permit"
+  ): TypedContractMethod<
+    [
+      owner: AddressLike,
+      spender: AddressLike,
+      value: BigNumberish,
+      deadline: BigNumberish,
+      v: BigNumberish,
+      r: BytesLike,
+      s: BytesLike
+    ],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "symbol"
   ): TypedContractMethod<[], [string], "view">;
@@ -291,6 +410,13 @@ export interface ERC20Mock extends BaseContract {
     ApprovalEvent.OutputObject
   >;
   getEvent(
+    key: "EIP712DomainChanged"
+  ): TypedContractEvent<
+    EIP712DomainChangedEvent.InputTuple,
+    EIP712DomainChangedEvent.OutputTuple,
+    EIP712DomainChangedEvent.OutputObject
+  >;
+  getEvent(
     key: "Transfer"
   ): TypedContractEvent<
     TransferEvent.InputTuple,
@@ -308,6 +434,17 @@ export interface ERC20Mock extends BaseContract {
       ApprovalEvent.InputTuple,
       ApprovalEvent.OutputTuple,
       ApprovalEvent.OutputObject
+    >;
+
+    "EIP712DomainChanged()": TypedContractEvent<
+      EIP712DomainChangedEvent.InputTuple,
+      EIP712DomainChangedEvent.OutputTuple,
+      EIP712DomainChangedEvent.OutputObject
+    >;
+    EIP712DomainChanged: TypedContractEvent<
+      EIP712DomainChangedEvent.InputTuple,
+      EIP712DomainChangedEvent.OutputTuple,
+      EIP712DomainChangedEvent.OutputObject
     >;
 
     "Transfer(address,address,uint256)": TypedContractEvent<

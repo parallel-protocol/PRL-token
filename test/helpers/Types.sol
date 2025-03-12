@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.25;
 
-import { User } from "./User.sol";
+import { Vm } from "@forge-std/Test.sol";
 
 struct Users {
     // Default owner for all contracts.
-    User owner;
+    Vm.Wallet owner;
     // Impartial user.
-    User alice;
+    Vm.Wallet alice;
     // Impartial user.
-    User bob;
+    Vm.Wallet bob;
     // Malicious user.
-    User hacker;
+    Vm.Wallet hacker;
 }

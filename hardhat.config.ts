@@ -76,10 +76,10 @@ const config: HardhatUserConfig = {
       verify: getVerifyConfig("amoy"),
       accounts,
     },
-    arbSepolia: {
+    arbiSepolia: {
       eid: EndpointId.ARBSEP_V2_TESTNET,
-      url: getRpcURL("arbSepolia"),
-      verify: getVerifyConfig("arbSepolia"),
+      url: getRpcURL("arbiSepolia"),
+      verify: getVerifyConfig("arbiSepolia"),
       accounts,
     },
     fantom: {

@@ -50,8 +50,6 @@ export type { ISendLib } from "./@layerzerolabs/lz-evm-protocol-v2/contracts/int
 export { ISendLib__factory } from "./factories/@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ISendLib__factory";
 export type { AddressCast } from "./@layerzerolabs/lz-evm-protocol-v2/contracts/libs/AddressCast";
 export { AddressCast__factory } from "./factories/@layerzerolabs/lz-evm-protocol-v2/contracts/libs/AddressCast__factory";
-export type { IAccessManager } from "./@openzeppelin/contracts/access/manager/IAccessManager";
-export { IAccessManager__factory } from "./factories/@openzeppelin/contracts/access/manager/IAccessManager__factory";
 export type { Ownable } from "./@openzeppelin/contracts/access/Ownable";
 export { Ownable__factory } from "./factories/@openzeppelin/contracts/access/Ownable__factory";
 export type { IERC1155Errors } from "./@openzeppelin/contracts/interfaces/draft-IERC6093.sol/IERC1155Errors";

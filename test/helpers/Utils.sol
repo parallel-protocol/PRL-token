@@ -5,8 +5,6 @@ import { Test } from "@forge-std/Test.sol";
 
 import { OFTMsgCodec } from "contracts/layerZero/libs/OFTMsgCodec.sol";
 
-import "./User.sol";
-
 abstract contract Utils is Test {
     uint256 internal constant BLOCK_TIME = 12;
 
@@ -72,9 +70,5 @@ abstract contract Utils is Test {
         // Encode the entire message, prepend and append the length of extraReturnOptions
         return
             abi.encode(OFTMsgCodec.addressToBytes32(receiver), amount, dstEid, extraOptionsLength, extraReturnOptions);
-    }
-
-    function startPrank(User user) internal {
-        vm.startPrank(user.addr());
     }
 }

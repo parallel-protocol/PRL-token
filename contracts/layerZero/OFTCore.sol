@@ -320,6 +320,5 @@ abstract contract OFTCore is IOFT, OApp, OAppPreCrimeSimulator, OAppOptionsType3
     /// @return amountReceived The amount ACTUALLY received.
     /// @dev Defined here but are intended to be overriden depending on the OFT implementation.
     /// @dev Depending on OFT implementation the _amount could differ from the amountReceived.
-
     function _credit(address _to, uint256 _amount, uint32 _srcEid) internal virtual returns (uint256 amountReceived);
 }

@@ -90,6 +90,7 @@ contract PeripheralMigrationContract is OAppSender, OAppOptionsType3, Pausable {
         address _receiver,
         uint256 _amount,
         uint32 _dstEid,
+        address _refundAddress,
         bytes calldata _extraSendOptions,
         bytes calldata _extraReturnOptions
     )
@@ -98,11 +99,11 @@ contract PeripheralMigrationContract is OAppSender, OAppOptionsType3, Pausable {
         whenNotPaused
         returns (MessagingReceipt memory msgReceipt)
     {
+        if (_refundAddress == address(0)) revert ErrorsLib.AddressZero();
         uint256 fee = msg.value;
         bytes memory options =
             combineOptions(_dstEid, _extraSendOptions.length > 0 ? SEND_AND_MIGRATE : SEND, _extraSendOptions);
 
-        emit MigrationMessageSent(msgReceipt.guid, _dstEid, msg.sender, _receiver, fee, _amount);
         MIMO.safeTransferFrom(msg.sender, address(this), _amount);
         msgReceipt = _lzSend(
             mainEid,
@@ -111,8 +112,9 @@ contract PeripheralMigrationContract is OAppSender, OAppOptionsType3, Pausable {
             // Fee in native gas and ZRO token.
             MessagingFee(msg.value, 0),
             // Refund address in case of failed source message.
-            payable(msg.sender)
+            _refundAddress
         );
+        emit MigrationMessageSent(msgReceipt.guid, _dstEid, msg.sender, _receiver, fee, _amount);
     }
 
     /// @notice Returns the estimated messaging fee for a given message.
@@ -135,7 +137,7 @@ contract PeripheralMigrationContract is OAppSender, OAppOptionsType3, Pausable {
     {
         bytes memory payload = _encodeMessage(_receiver, _amount, _dstEid, _extraReturnOptions);
         bytes memory options =
-            combineOptions(mainEid, _extraSendOptions.length > 0 ? SEND_AND_MIGRATE : SEND, _extraSendOptions);
+            combineOptions(_dstEid, _extraSendOptions.length > 0 ? SEND_AND_MIGRATE : SEND, _extraSendOptions);
         fee = _quote(mainEid, payload, options, false);
     }
 

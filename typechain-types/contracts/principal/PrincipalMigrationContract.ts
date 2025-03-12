@@ -35,6 +35,44 @@ export type EnforcedOptionParamStructOutput = [
   options: string
 ] & { eid: bigint; msgType: bigint; options: string };
 
+export type SendParamStruct = {
+  dstEid: BigNumberish;
+  to: BytesLike;
+  amount: BigNumberish;
+  minAmount: BigNumberish;
+  extraOptions: BytesLike;
+  composeMsg: BytesLike;
+  oftCmd: BytesLike;
+};
+
+export type SendParamStructOutput = [
+  dstEid: bigint,
+  to: string,
+  amount: bigint,
+  minAmount: bigint,
+  extraOptions: string,
+  composeMsg: string,
+  oftCmd: string
+] & {
+  dstEid: bigint;
+  to: string;
+  amount: bigint;
+  minAmount: bigint;
+  extraOptions: string;
+  composeMsg: string;
+  oftCmd: string;
+};
+
+export type MessagingFeeStruct = {
+  nativeFee: BigNumberish;
+  lzTokenFee: BigNumberish;
+};
+
+export type MessagingFeeStructOutput = [
+  nativeFee: bigint,
+  lzTokenFee: bigint
+] & { nativeFee: bigint; lzTokenFee: bigint };
+
 export type OriginStruct = {
   srcEid: BigNumberish;
   sender: BytesLike;
@@ -50,7 +88,6 @@ export type OriginStructOutput = [
 export interface PrincipalMigrationContractInterface extends Interface {
   getFunction(
     nameOrSignature:
-      | "MIGRATION_RATIO"
       | "MIMO"
       | "PRL"
       | "_decodeMessage"
@@ -62,7 +99,8 @@ export interface PrincipalMigrationContractInterface extends Interface {
       | "isComposeMsgSender"
       | "lockBox"
       | "lzReceive"
-      | "migrateMimoToPRL"
+      | "migrateToPRL"
+      | "migrateToPRLAndBridge"
       | "nextNonce"
       | "oAppVersion"
       | "owner"
@@ -82,6 +120,7 @@ export interface PrincipalMigrationContractInterface extends Interface {
       | "EmergencyRescued"
       | "EnforcedOptionSet"
       | "MIMOToPRLMigrated"
+      | "MIMOToPRLMigratedAndBridged"
       | "MigrationMessageReceived"
       | "OwnershipTransferred"
       | "Paused"
@@ -89,10 +128,6 @@ export interface PrincipalMigrationContractInterface extends Interface {
       | "Unpaused"
   ): EventFragment;
 
-  encodeFunctionData(
-    functionFragment: "MIGRATION_RATIO",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "MIMO", values?: undefined): string;
   encodeFunctionData(functionFragment: "PRL", values?: undefined): string;
   encodeFunctionData(
@@ -126,8 +161,12 @@ export interface PrincipalMigrationContractInterface extends Interface {
     values: [OriginStruct, BytesLike, BytesLike, AddressLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "migrateMimoToPRL",
-    values: [BigNumberish]
+    functionFragment: "migrateToPRL",
+    values: [BigNumberish, AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "migrateToPRLAndBridge",
+    values: [SendParamStruct, MessagingFeeStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "nextNonce",
@@ -163,10 +202,6 @@ export interface PrincipalMigrationContractInterface extends Interface {
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
 
-  decodeFunctionResult(
-    functionFragment: "MIGRATION_RATIO",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "MIMO", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "PRL", data: BytesLike): Result;
   decodeFunctionResult(
@@ -197,7 +232,11 @@ export interface PrincipalMigrationContractInterface extends Interface {
   decodeFunctionResult(functionFragment: "lockBox", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "lzReceive", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "migrateMimoToPRL",
+    functionFragment: "migrateToPRL",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "migrateToPRLAndBridge",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "nextNonce", data: BytesLike): Result;
@@ -263,19 +302,40 @@ export namespace EnforcedOptionSetEvent {
 
 export namespace MIMOToPRLMigratedEvent {
   export type InputTuple = [
+    caller: AddressLike,
     receiver: AddressLike,
-    mimoAmount: BigNumberish,
-    prlAmount: BigNumberish
+    amount: BigNumberish
+  ];
+  export type OutputTuple = [caller: string, receiver: string, amount: bigint];
+  export interface OutputObject {
+    caller: string;
+    receiver: string;
+    amount: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace MIMOToPRLMigratedAndBridgedEvent {
+  export type InputTuple = [
+    caller: AddressLike,
+    receiver: AddressLike,
+    sendParam: SendParamStruct,
+    fee: MessagingFeeStruct
   ];
   export type OutputTuple = [
+    caller: string,
     receiver: string,
-    mimoAmount: bigint,
-    prlAmount: bigint
+    sendParam: SendParamStructOutput,
+    fee: MessagingFeeStructOutput
   ];
   export interface OutputObject {
+    caller: string;
     receiver: string;
-    mimoAmount: bigint;
-    prlAmount: bigint;
+    sendParam: SendParamStructOutput;
+    fee: MessagingFeeStructOutput;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -410,8 +470,6 @@ export interface PrincipalMigrationContract extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
-  MIGRATION_RATIO: TypedContractMethod<[], [bigint], "view">;
-
   MIMO: TypedContractMethod<[], [string], "view">;
 
   PRL: TypedContractMethod<[], [string], "view">;
@@ -475,10 +533,16 @@ export interface PrincipalMigrationContract extends BaseContract {
     "payable"
   >;
 
-  migrateMimoToPRL: TypedContractMethod<
-    [_amount: BigNumberish],
+  migrateToPRL: TypedContractMethod<
+    [_amount: BigNumberish, _recipient: AddressLike],
     [void],
     "nonpayable"
+  >;
+
+  migrateToPRLAndBridge: TypedContractMethod<
+    [_sendParam: SendParamStruct, _fee: MessagingFeeStruct],
+    [void],
+    "payable"
   >;
 
   nextNonce: TypedContractMethod<
@@ -533,9 +597,6 @@ export interface PrincipalMigrationContract extends BaseContract {
     key: string | FunctionFragment
   ): T;
 
-  getFunction(
-    nameOrSignature: "MIGRATION_RATIO"
-  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "MIMO"
   ): TypedContractMethod<[], [string], "view">;
@@ -607,8 +668,19 @@ export interface PrincipalMigrationContract extends BaseContract {
     "payable"
   >;
   getFunction(
-    nameOrSignature: "migrateMimoToPRL"
-  ): TypedContractMethod<[_amount: BigNumberish], [void], "nonpayable">;
+    nameOrSignature: "migrateToPRL"
+  ): TypedContractMethod<
+    [_amount: BigNumberish, _recipient: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "migrateToPRLAndBridge"
+  ): TypedContractMethod<
+    [_sendParam: SendParamStruct, _fee: MessagingFeeStruct],
+    [void],
+    "payable"
+  >;
   getFunction(
     nameOrSignature: "nextNonce"
   ): TypedContractMethod<
@@ -684,6 +756,13 @@ export interface PrincipalMigrationContract extends BaseContract {
     MIMOToPRLMigratedEvent.OutputObject
   >;
   getEvent(
+    key: "MIMOToPRLMigratedAndBridged"
+  ): TypedContractEvent<
+    MIMOToPRLMigratedAndBridgedEvent.InputTuple,
+    MIMOToPRLMigratedAndBridgedEvent.OutputTuple,
+    MIMOToPRLMigratedAndBridgedEvent.OutputObject
+  >;
+  getEvent(
     key: "MigrationMessageReceived"
   ): TypedContractEvent<
     MigrationMessageReceivedEvent.InputTuple,
@@ -742,7 +821,7 @@ export interface PrincipalMigrationContract extends BaseContract {
       EnforcedOptionSetEvent.OutputObject
     >;
 
-    "MIMOToPRLMigrated(address,uint256,uint256)": TypedContractEvent<
+    "MIMOToPRLMigrated(address,address,uint256)": TypedContractEvent<
       MIMOToPRLMigratedEvent.InputTuple,
       MIMOToPRLMigratedEvent.OutputTuple,
       MIMOToPRLMigratedEvent.OutputObject
@@ -751,6 +830,17 @@ export interface PrincipalMigrationContract extends BaseContract {
       MIMOToPRLMigratedEvent.InputTuple,
       MIMOToPRLMigratedEvent.OutputTuple,
       MIMOToPRLMigratedEvent.OutputObject
+    >;
+
+    "MIMOToPRLMigratedAndBridged(address,address,tuple,tuple)": TypedContractEvent<
+      MIMOToPRLMigratedAndBridgedEvent.InputTuple,
+      MIMOToPRLMigratedAndBridgedEvent.OutputTuple,
+      MIMOToPRLMigratedAndBridgedEvent.OutputObject
+    >;
+    MIMOToPRLMigratedAndBridged: TypedContractEvent<
+      MIMOToPRLMigratedAndBridgedEvent.InputTuple,
+      MIMOToPRLMigratedAndBridgedEvent.OutputTuple,
+      MIMOToPRLMigratedAndBridgedEvent.OutputObject
     >;
 
     "MigrationMessageReceived(bytes32,uint32,address,uint32,address,uint256,uint256)": TypedContractEvent<

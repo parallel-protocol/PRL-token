@@ -13,14 +13,14 @@ contract PrincipalMigrationContract_EmergencyRescue_Integrations_Test is Integra
     }
 
     modifier pauseContract() {
-        address owner = users.owner.addr();
+        address owner = users.owner.addr;
         vm.startPrank(owner);
         principalMigrationContract.pause();
         _;
     }
 
     function test_PrincipalMigrationContract_EmergencyRescue() external pauseContract {
-        address owner = users.owner.addr();
+        address owner = users.owner.addr;
         vm.startPrank(owner);
         vm.expectEmit(address(principalMigrationContract));
         emit PrincipalMigrationContract.EmergencyRescued(address(mimo), INITIAL_BALANCE, owner);
@@ -29,14 +29,14 @@ contract PrincipalMigrationContract_EmergencyRescue_Integrations_Test is Integra
     }
 
     function test_PrincipalMigrationContract_EmergencyRescue_RevertWhen_NotPaused() external {
-        address owner = users.owner.addr();
+        address owner = users.owner.addr;
         vm.startPrank(owner);
         vm.expectRevert(abi.encodeWithSelector(Pausable.ExpectedPause.selector));
         principalMigrationContract.emergencyRescue(address(mimo), INITIAL_BALANCE);
     }
 
     function test_PrincipalMigrationContract_EmergencyRescue_RevertWhen_CallerNotOwner() external {
-        address hacker = users.hacker.addr();
+        address hacker = users.hacker.addr;
         vm.startPrank(hacker);
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, hacker));
         principalMigrationContract.emergencyRescue(address(mimo), INITIAL_BALANCE);

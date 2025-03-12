@@ -5,29 +5,27 @@ import "test/Integrations.t.sol";
 
 contract PeripheralPRL_Send_Integrations_Test is Integrations_Test {
     using OptionsBuilder for bytes;
-    using WadRayMath for uint256;
 
     function testFuzz_PeripheralPRL_Send_ToMainChain(uint256 amountToMigrate) external {
         amountToMigrate = _bound(amountToMigrate, 10, INITIAL_BALANCE);
 
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200_000, 0);
 
-        address alice = users.alice.addr();
-        deal(address(peripheralPRLA), alice, amountToMigrate);
+        deal(address(peripheralPRLA), users.alice.addr, amountToMigrate);
         deal(address(prl), address(lockBox), amountToMigrate);
 
         SendParam memory sendParam =
-            SendParam(mainEid, addressToBytes32(users.alice.addr()), amountToMigrate, amountToMigrate, options, "", "");
+            SendParam(mainEid, addressToBytes32(users.alice.addr), amountToMigrate, amountToMigrate, options, "", "");
 
         MessagingFee memory fees = peripheralPRLA.quoteSend(sendParam, false);
 
-        vm.startPrank(alice);
-        peripheralPRLA.send{ value: fees.nativeFee }(sendParam, fees, alice);
+        vm.startPrank(users.alice.addr);
+        peripheralPRLA.send{ value: fees.nativeFee }(sendParam, fees, users.alice.addr);
 
         verifyPackets(mainEid, address(lockBox));
 
-        assertEq(peripheralPRLA.balanceOf(alice), 0);
-        assertEq(prl.balanceOf(alice), amountToMigrate);
+        assertEq(peripheralPRLA.balanceOf(users.alice.addr), 0);
+        assertEq(prl.balanceOf(users.alice.addr), amountToMigrate);
         assertEq(prl.balanceOf(address(lockBox)), 0);
     }
 
@@ -36,26 +34,25 @@ contract PeripheralPRL_Send_Integrations_Test is Integrations_Test {
 
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200_000, 0);
 
-        address alice = users.alice.addr();
-        deal(address(peripheralPRLA), alice, amountToMigrate);
+        deal(address(peripheralPRLA), users.alice.addr, amountToMigrate);
 
         SendParam memory sendParam =
-            SendParam(bEid, addressToBytes32(users.alice.addr()), amountToMigrate, amountToMigrate, options, "", "");
+            SendParam(bEid, addressToBytes32(users.alice.addr), amountToMigrate, amountToMigrate, options, "", "");
 
         MessagingFee memory fees = peripheralPRLA.quoteSend(sendParam, false);
 
-        vm.startPrank(alice);
+        vm.startPrank(users.alice.addr);
         peripheralPRLA.approve(address(peripheralPRLA), amountToMigrate);
-        peripheralPRLA.send{ value: fees.nativeFee }(sendParam, fees, alice);
+        peripheralPRLA.send{ value: fees.nativeFee }(sendParam, fees, users.alice.addr);
 
         verifyPackets(bEid, address(peripheralPRLB));
 
-        assertEq(peripheralPRLA.balanceOf(alice), 0);
-        assertEq(peripheralPRLB.balanceOf(alice), amountToMigrate);
+        assertEq(peripheralPRLA.balanceOf(users.alice.addr), 0);
+        assertEq(peripheralPRLB.balanceOf(users.alice.addr), amountToMigrate);
     }
 
     modifier PauseContract() {
-        startPrank(users.owner);
+        vm.startPrank(users.owner.addr);
         peripheralPRLA.pause();
         _;
     }
@@ -63,12 +60,11 @@ contract PeripheralPRL_Send_Integrations_Test is Integrations_Test {
     function test_PeripheralPRL_Send_RevertWhen_Paused() external PauseContract {
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200_000, 0);
 
-        address alice = users.alice.addr();
-        deal(address(peripheralPRLA), alice, DEFAULT_AMOUNT_MIGRATED);
+        deal(address(peripheralPRLA), users.alice.addr, DEFAULT_AMOUNT_MIGRATED);
 
         SendParam memory sendParam = SendParam(
             mainEid,
-            addressToBytes32(users.alice.addr()),
+            addressToBytes32(users.alice.addr),
             DEFAULT_AMOUNT_MIGRATED,
             DEFAULT_AMOUNT_MIGRATED,
             options,
@@ -77,8 +73,8 @@ contract PeripheralPRL_Send_Integrations_Test is Integrations_Test {
         );
         MessagingFee memory fees = peripheralPRLA.quoteSend(sendParam, false);
 
-        vm.startPrank(alice);
+        vm.startPrank(users.alice.addr);
         vm.expectRevert(abi.encodeWithSelector(Pausable.EnforcedPause.selector));
-        peripheralPRLA.send{ value: fees.nativeFee }(sendParam, fees, alice);
+        peripheralPRLA.send{ value: fees.nativeFee }(sendParam, fees, users.alice.addr);
     }
 }
