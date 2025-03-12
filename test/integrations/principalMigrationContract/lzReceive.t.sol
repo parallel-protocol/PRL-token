@@ -90,4 +90,28 @@ contract PrincipalMigrationContract_LzReceive_Integrations_Test is Integrations_
         assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - amountToMigrate);
         assertEq(prl.balanceOf(address(lockBox)), amountToMigrate);
     }
+
+    function testFuzz_LzReceive_MigrateOnPrincipalChain_WhenNotEnoughFees(uint256 amountToMigrate) external {
+        amountToMigrate = _bound(amountToMigrate, 10, INITIAL_BALANCE);
+        uint256 aliceNativeBalanceBefore = users.alice.addr.balance;
+        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(450_000, 0);
+        bytes memory extraReturnOptions = OptionsBuilder.newOptions().addExecutorLzReceiveOption(210_000, 0);
+
+        MessagingFee memory fees =
+            peripheralMigrationContractA.quote(bEid, users.alice.addr, amountToMigrate, options, extraReturnOptions);
+
+        Origin memory origin = Origin(aEid, addressToBytes32(address(peripheralMigrationContractA)), 1);
+        bytes memory message = _buildMessage(users.alice.addr, amountToMigrate, bEid, extraReturnOptions);
+        address endpoint = address(principalMigrationContract.endpoint());
+        vm.startPrank(endpoint);
+        vm.deal({ account: endpoint, newBalance: fees.nativeFee });
+
+        uint256 wrongFees = fees.nativeFee / 5;
+        principalMigrationContract.lzReceive{ value: wrongFees }(origin, guid, message, address(0), bytes(""));
+
+        assertEq(peripheralPRLB.balanceOf(users.alice.addr), 0);
+        assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - amountToMigrate);
+        assertEq(prl.balanceOf(address(users.alice.addr)), amountToMigrate);
+        assertEq(users.alice.addr.balance, aliceNativeBalanceBefore + wrongFees);
+    }
 }
