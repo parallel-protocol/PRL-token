@@ -12,17 +12,17 @@ contract PeripheralMigrationContract_LzReceive_Integrations_Test is Integrations
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(450_000, 0);
 
         MessagingFee memory fees =
-            peripheralMigrationContractA.quote(mainEid, users.alice.addr(), amountToMigrate, options, "");
+            peripheralMigrationContractA.quote(mainEid, users.alice.addr, amountToMigrate, options, "");
 
-        startPrank(users.alice);
+        vm.startPrank(users.alice.addr);
         mimo.approve(address(peripheralMigrationContractA), amountToMigrate);
         peripheralMigrationContractA.migrateToPRL{ value: fees.nativeFee }(
-            users.alice.addr(), amountToMigrate, mainEid, options, ""
+            users.alice.addr, amountToMigrate, mainEid, users.alice.addr, options, ""
         );
         verifyPackets(mainEid, addressToBytes32(address(principalMigrationContract)));
 
-        assertEq(mimo.balanceOf(users.alice.addr()), INITIAL_BALANCE - amountToMigrate);
-        assertEq(prl.balanceOf(users.alice.addr()), amountToMigrate);
+        assertEq(mimo.balanceOf(users.alice.addr), INITIAL_BALANCE - amountToMigrate);
+        assertEq(prl.balanceOf(users.alice.addr), amountToMigrate);
         assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - amountToMigrate);
     }
 
@@ -33,7 +33,7 @@ contract PeripheralMigrationContract_LzReceive_Integrations_Test is Integrations
 
         MessagingFee memory destChainFees = lockBox.quoteSend(
             SendParam(
-                aEid, addressToBytes32(users.alice.addr()), amountToMigrate, amountToMigrate, extraReturnOptions, "", ""
+                aEid, addressToBytes32(users.alice.addr), amountToMigrate, amountToMigrate, extraReturnOptions, "", ""
             ),
             false
         );
@@ -41,18 +41,18 @@ contract PeripheralMigrationContract_LzReceive_Integrations_Test is Integrations
         bytes memory options =
             OptionsBuilder.newOptions().addExecutorLzReceiveOption(800_000, uint128(destChainFees.nativeFee));
         MessagingFee memory fees =
-            peripheralMigrationContractA.quote(aEid, users.alice.addr(), amountToMigrate, options, extraReturnOptions);
+            peripheralMigrationContractA.quote(aEid, users.alice.addr, amountToMigrate, options, extraReturnOptions);
 
-        startPrank(users.alice);
+        vm.startPrank(users.alice.addr);
         mimo.approve(address(peripheralMigrationContractA), amountToMigrate);
         peripheralMigrationContractA.migrateToPRL{ value: fees.nativeFee + destChainFees.nativeFee }(
-            users.alice.addr(), amountToMigrate, aEid, options, extraReturnOptions
+            users.alice.addr, amountToMigrate, aEid, users.alice.addr, options, extraReturnOptions
         );
         verifyPackets(mainEid, address(principalMigrationContract));
         verifyPackets(aEid, address(peripheralPRLA));
 
-        assertEq(mimo.balanceOf(users.alice.addr()), INITIAL_BALANCE - amountToMigrate);
-        assertEq(peripheralPRLA.balanceOf(users.alice.addr()), amountToMigrate);
+        assertEq(mimo.balanceOf(users.alice.addr), INITIAL_BALANCE - amountToMigrate);
+        assertEq(peripheralPRLA.balanceOf(users.alice.addr), amountToMigrate);
         assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - amountToMigrate);
     }
 
@@ -63,7 +63,7 @@ contract PeripheralMigrationContract_LzReceive_Integrations_Test is Integrations
 
         MessagingFee memory destChainFees = lockBox.quoteSend(
             SendParam(
-                bEid, addressToBytes32(users.alice.addr()), amountToMigrate, amountToMigrate, extraReturnOptions, "", ""
+                bEid, addressToBytes32(users.alice.addr), amountToMigrate, amountToMigrate, extraReturnOptions, "", ""
             ),
             false
         );
@@ -72,41 +72,55 @@ contract PeripheralMigrationContract_LzReceive_Integrations_Test is Integrations
             OptionsBuilder.newOptions().addExecutorLzReceiveOption(800_000, uint128(destChainFees.nativeFee));
 
         MessagingFee memory fees =
-            peripheralMigrationContractA.quote(bEid, users.alice.addr(), amountToMigrate, options, extraReturnOptions);
-        startPrank(users.alice);
+            peripheralMigrationContractA.quote(bEid, users.alice.addr, amountToMigrate, options, extraReturnOptions);
+        vm.startPrank(users.alice.addr);
 
         mimo.approve(address(peripheralMigrationContractA), amountToMigrate);
         peripheralMigrationContractA.migrateToPRL{ value: fees.nativeFee + destChainFees.nativeFee }(
-            users.alice.addr(), amountToMigrate, bEid, options, extraReturnOptions
+            users.alice.addr, amountToMigrate, bEid, users.alice.addr, options, extraReturnOptions
         );
 
         verifyPackets(mainEid, address(principalMigrationContract));
         verifyPackets(bEid, address(peripheralPRLB));
 
-        assertEq(mimo.balanceOf(users.alice.addr()), INITIAL_BALANCE - amountToMigrate);
-        assertEq(peripheralPRLB.balanceOf(users.alice.addr()), amountToMigrate);
+        assertEq(mimo.balanceOf(users.alice.addr), INITIAL_BALANCE - amountToMigrate);
+        assertEq(peripheralPRLB.balanceOf(users.alice.addr), amountToMigrate);
         assertEq(prl.balanceOf(address(principalMigrationContract)), DEFAULT_PRL_SUPPLY - amountToMigrate);
     }
 
     modifier PauseContract() {
-        startPrank(users.owner);
+        vm.startPrank(users.owner.addr);
         peripheralMigrationContractA.pause();
         _;
     }
 
     function test_MigrateToPRL_RevertWhen_Paused() external PauseContract {
-        address alice = users.alice.addr();
-
         bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(450_000, 0);
         bytes memory extraReturnOptions = OptionsBuilder.newOptions().addExecutorLzReceiveOption(210_000, 0);
 
-        MessagingFee memory fees =
-            peripheralMigrationContractA.quote(mainEid, alice, DEFAULT_AMOUNT_MIGRATED, options, extraReturnOptions);
+        MessagingFee memory fees = peripheralMigrationContractA.quote(
+            mainEid, users.alice.addr, DEFAULT_AMOUNT_MIGRATED, options, extraReturnOptions
+        );
 
-        vm.startPrank(alice);
+        vm.startPrank(users.alice.addr);
         vm.expectRevert(abi.encodeWithSelector(Pausable.EnforcedPause.selector));
         peripheralMigrationContractA.migrateToPRL{ value: fees.nativeFee }(
-            alice, DEFAULT_AMOUNT_MIGRATED, mainEid, options, extraReturnOptions
+            users.alice.addr, DEFAULT_AMOUNT_MIGRATED, mainEid, users.alice.addr, options, extraReturnOptions
+        );
+    }
+
+    function test_MigrateToPRL_RevertWhen_RefundAddressIsZero() external {
+        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(450_000, 0);
+        bytes memory extraReturnOptions = OptionsBuilder.newOptions().addExecutorLzReceiveOption(210_000, 0);
+
+        MessagingFee memory fees = peripheralMigrationContractA.quote(
+            mainEid, users.alice.addr, DEFAULT_AMOUNT_MIGRATED, options, extraReturnOptions
+        );
+
+        vm.startPrank(users.alice.addr);
+        vm.expectRevert(abi.encodeWithSelector(ErrorsLib.AddressZero.selector));
+        peripheralMigrationContractA.migrateToPRL{ value: fees.nativeFee }(
+            users.alice.addr, DEFAULT_AMOUNT_MIGRATED, mainEid, address(0), options, extraReturnOptions
         );
     }
 }

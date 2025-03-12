@@ -8,7 +8,7 @@ import "test/Integrations.t.sol";
 
 contract PrincipalMigrationContract_Pause_Integrations_Test is Integrations_Test {
     function test_PrincipalMigrationContract_Pause() external {
-        address owner = users.owner.addr();
+        address owner = users.owner.addr;
         vm.startPrank(owner);
         vm.expectEmit(address(principalMigrationContract));
         emit Pausable.Paused(owner);
@@ -17,7 +17,7 @@ contract PrincipalMigrationContract_Pause_Integrations_Test is Integrations_Test
     }
 
     function test_PrincipalMigrationContract_RevertWhen_CallerNotOwner() external {
-        address hacker = users.hacker.addr();
+        address hacker = users.hacker.addr;
         vm.startPrank(hacker);
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, hacker));
         principalMigrationContract.pause();

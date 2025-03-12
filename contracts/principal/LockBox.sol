@@ -88,7 +88,10 @@ contract LockBox is OFTAdapter, Pausable {
         whenNotPaused
         returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt)
     {
-        IERC20Permit(address(innerToken)).permit(msg.sender, address(this), _sendParam.amount, _deadline, _v, _r, _s);
+        // @dev using try catch to avoid reverting the transaction in case of front-running
+        try IERC20Permit(address(innerToken)).permit(
+            msg.sender, address(this), _sendParam.amount, _deadline, _v, _r, _s
+        ) { } catch { }
         return super.send(_sendParam, _fee, _refundAddress);
     }
 

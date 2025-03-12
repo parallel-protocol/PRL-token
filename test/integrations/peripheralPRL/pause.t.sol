@@ -8,7 +8,7 @@ import "test/Integrations.t.sol";
 
 contract PeripheralPRL_Pause_Integrations_Test is Integrations_Test {
     function test_PeripheralPRL_Pause() external {
-        address owner = users.owner.addr();
+        address owner = users.owner.addr;
         vm.startPrank(owner);
         vm.expectEmit(address(peripheralPRLA));
         emit Pausable.Paused(owner);
@@ -17,7 +17,7 @@ contract PeripheralPRL_Pause_Integrations_Test is Integrations_Test {
     }
 
     function test_PeripheralPRL_RevertWhen_CallerNotOwner() external {
-        address hacker = users.hacker.addr();
+        address hacker = users.hacker.addr;
         vm.startPrank(hacker);
         vm.expectRevert(abi.encodeWithSelector(Ownable.OwnableUnauthorizedAccount.selector, hacker));
         peripheralPRLA.pause();

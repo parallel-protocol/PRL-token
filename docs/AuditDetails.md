@@ -84,6 +84,13 @@ Read the [README](../README.md) for more context.
 - Does it use a side-chain?: No
 ```
 
+## Audit Notes
+
+### Ownable address
+
+The owner defined on every contract using OpenZeppelin's Ownable contract is the AccessManager contract. Specific roles
+will be defined to call contract functions with a delay.
+
 ## Tests
 
 The contract is tested using the `foundry` framework. The tests are located in the `tests` folder.

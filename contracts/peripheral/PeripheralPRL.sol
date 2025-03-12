@@ -54,37 +54,7 @@ contract PeripheralPRL is OFT, ERC20Permit, Pausable {
         whenNotPaused
         returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt)
     {
-        return super.send(_sendParam, _fee, _refundAddress);
-    }
-
-    /// @notice Sends tokens to another chain using EIP-2612 permit
-    /// @dev This function combines permit and send operations
-    /// @param _sendParam Parameters for the send operation
-    /// @param _fee Messaging fee for the LayerZero transaction
-    /// @param _refundAddress Address to refund excess fees
-    /// @param _deadline Expiration time of the permit signature
-    /// @param _v ECDSA signature parameter v
-    /// @param _r ECDSA signature parameter r
-    /// @param _s ECDSA signature parameter s
-    /// @return msgReceipt Receipt for the LayerZero message
-    /// @return oftReceipt Receipt for the OFT transaction
-    function sendWithPermit(
-        SendParam calldata _sendParam,
-        MessagingFee calldata _fee,
-        address _refundAddress,
-        uint256 _deadline,
-        uint8 _v,
-        bytes32 _r,
-        bytes32 _s
-    )
-        external
-        payable
-        whenNotPaused
-        returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt)
-    {
-        // Approve the spending using EIP-2612 permit
-        permit(msg.sender, address(this), _sendParam.amount, _deadline, _v, _r, _s);
-        // Execute the send operation
+        if (_refundAddress == address(0)) revert ErrorsLib.AddressZero();
         return super.send(_sendParam, _fee, _refundAddress);
     }
 
